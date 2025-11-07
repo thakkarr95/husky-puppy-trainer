@@ -72,6 +72,53 @@ const FoodTracker = ({ foodEntries, onAddFoodEntry, onUpdateFeedingTime }: FoodT
 
   const weeklyStats = getWeeklyStats();
 
+  // Calculate kibble transition amounts
+  const getTransitionDay = () => {
+    const pickupDate = new Date(PUPPY_PICKUP_DATE);
+    const today = new Date();
+    const diffTime = today.getTime() - pickupDate.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays + 1; // Day 1 is pickup day
+  };
+
+  const getKibbleAmounts = () => {
+    const transitionDay = getTransitionDay();
+    const totalPerMeal = currentGuideline.cupsPerMeal;
+    
+    if (transitionDay <= 2) {
+      // Days 1-2: 75% old, 25% new
+      return {
+        oldKibble: (totalPerMeal * 0.75).toFixed(2),
+        newKibble: (totalPerMeal * 0.25).toFixed(2),
+        phase: 'Days 1-2'
+      };
+    } else if (transitionDay <= 4) {
+      // Days 3-4: 50% old, 50% new
+      return {
+        oldKibble: (totalPerMeal * 0.50).toFixed(2),
+        newKibble: (totalPerMeal * 0.50).toFixed(2),
+        phase: 'Days 3-4'
+      };
+    } else if (transitionDay <= 7) {
+      // Days 5-7: 25% old, 75% new
+      return {
+        oldKibble: (totalPerMeal * 0.25).toFixed(2),
+        newKibble: (totalPerMeal * 0.75).toFixed(2),
+        phase: 'Days 5-7'
+      };
+    } else {
+      // Day 8+: 100% new
+      return {
+        oldKibble: '0.00',
+        newKibble: totalPerMeal.toFixed(2),
+        phase: 'Day 8+ (Complete)'
+      };
+    }
+  };
+
+  const kibbleAmounts = getKibbleAmounts();
+  const transitionDay = getTransitionDay();
+
   return (
     <div className="food-tracker-container">
       <div className="tracker-content">
@@ -180,7 +227,33 @@ const FoodTracker = ({ foodEntries, onAddFoodEntry, onUpdateFeedingTime }: FoodT
           <h3>📌 Current Feeding Plan ({currentGuideline.ageRange})</h3>
           <div className="guideline-quick-view">
             <p><strong>Meals:</strong> {currentGuideline.mealsPerDay} times per day</p>
-            <p><strong>Per Meal:</strong> {currentGuideline.cupsPerMeal.toFixed(2)} cups</p>
+            <p><strong>Total Per Meal:</strong> {currentGuideline.cupsPerMeal.toFixed(2)} cups</p>
+            {transitionDay <= 7 && (
+              <div className="kibble-breakdown">
+                <p className="transition-phase-label">🔄 Transition Phase: <strong>{kibbleAmounts.phase}</strong> (Day {transitionDay})</p>
+                <div className="kibble-amounts">
+                  <div className="kibble-amount old">
+                    <span className="kibble-label">Old Kibble:</span>
+                    <span className="kibble-value">{kibbleAmounts.oldKibble} cups</span>
+                  </div>
+                  <div className="kibble-amount new">
+                    <span className="kibble-label">Kirkland Nature's Domain:</span>
+                    <span className="kibble-value">{kibbleAmounts.newKibble} cups</span>
+                  </div>
+                </div>
+              </div>
+            )}
+            {transitionDay > 7 && (
+              <div className="kibble-breakdown">
+                <p className="transition-complete">✅ <strong>Transition Complete!</strong> Using 100% Kirkland Nature's Domain</p>
+                <div className="kibble-amounts">
+                  <div className="kibble-amount new">
+                    <span className="kibble-label">Kirkland Nature's Domain:</span>
+                    <span className="kibble-value">{kibbleAmounts.newKibble} cups per meal</span>
+                  </div>
+                </div>
+              </div>
+            )}
             <p><strong>Expected Weight:</strong> {currentGuideline.weightRange}</p>
           </div>
         </div>

@@ -1901,6 +1901,64 @@
   font-weight: 600;
 }
 
+.kibble-breakdown {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 6px;
+  margin: 1rem 0;
+  border: 1px solid #e9ecef;
+}
+
+.transition-phase-label {
+  color: #495057;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+
+.transition-complete {
+  color: #10b981;
+  font-size: 0.95rem;
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+
+.kibble-amounts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.kibble-amount {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.kibble-amount.old {
+  background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+  border-left: 3px solid #6b7280;
+}
+
+.kibble-amount.new {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  border-left: 3px solid #10b981;
+}
+
+.kibble-label {
+  font-weight: 600;
+  color: #374151;
+}
+
+.kibble-value {
+  font-weight: 700;
+  color: #1f2937;
+  font-size: 1rem;
+}
+
 .weekly-progress-card {
   background: white;
   padding: 1.5rem;
@@ -3094,6 +3152,21 @@
   margin-top: 0.5rem;
 }
 
+.view-only-notice {
+  background: #fef3c7;
+  color: #92400e;
+  padding: 1rem 1.25rem;
+  margin: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid #f59e0b;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.view-only-notice strong {
+  font-weight: 700;
+}
+
 .category-filter {
   display: flex;
   gap: 0.5rem;
@@ -3151,6 +3224,20 @@
 .todo-item.completed {
   opacity: 0.7;
   background: #f9fafb;
+}
+
+.todo-item.read-only {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.todo-item.read-only .todo-checkbox {
+  cursor: not-allowed;
+}
+
+.todo-item.read-only .checkbox-custom {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .todo-item.category-feeding {

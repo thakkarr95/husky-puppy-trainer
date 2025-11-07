@@ -146,6 +146,13 @@ function DailyTodoList({ todoEntries, onUpdateTodo }: DailyTodoListProps) {
         <div className="progress-percentage">{stats.percentage}%</div>
       </div>
 
+      {/* Read-only notice for past/future dates */}
+      {!isToday() && (
+        <div className="view-only-notice">
+          👀 <strong>View Only:</strong> You can only log activities for today. Use this to review past schedules or plan ahead.
+        </div>
+      )}
+
       {/* Category Filter */}
       <div className="category-filter">
         <button 
@@ -190,15 +197,17 @@ function DailyTodoList({ todoEntries, onUpdateTodo }: DailyTodoListProps) {
       <div className="todo-list">
         {filteredItems.map((item) => {
           const completed = isItemCompleted(item.id);
+          const canEdit = isToday(); // Only allow editing today's tasks
           return (
-            <div key={item.id} className={`todo-item ${completed ? 'completed' : ''} category-${item.category.toLowerCase()}`}>
+            <div key={item.id} className={`todo-item ${completed ? 'completed' : ''} ${!canEdit ? 'read-only' : ''} category-${item.category.toLowerCase()}`}>
               <div className="todo-checkbox-wrapper">
                 <input
                   type="checkbox"
                   id={`todo-${item.id}`}
                   className="todo-checkbox"
                   checked={completed}
-                  onChange={() => handleToggleItem(item.id)}
+                  onChange={() => canEdit && handleToggleItem(item.id)}
+                  disabled={!canEdit}
                 />
                 <label htmlFor={`todo-${item.id}`} className="checkbox-custom"></label>
               </div>
