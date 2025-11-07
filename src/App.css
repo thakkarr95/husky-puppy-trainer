@@ -1728,6 +1728,103 @@
   font-size: 1.2rem;
 }
 
+/* Kibble Transition Styles */
+.kibble-transition-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #f59e0b;
+  margin-top: 1rem;
+}
+
+.kibble-transition-card h3 {
+  margin: 0 0 0.75rem 0;
+  color: #2c3e50;
+  font-size: 1.2rem;
+}
+
+.transition-intro {
+  color: #374151;
+  margin: 0.5rem 0;
+  line-height: 1.6;
+}
+
+.transition-warning {
+  background: #fef3c7;
+  color: #92400e;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  border-left: 3px solid #f59e0b;
+  margin: 1rem 0;
+  font-weight: 500;
+}
+
+.transition-schedule {
+  margin: 1.5rem 0;
+}
+
+.transition-day {
+  margin-bottom: 1rem;
+}
+
+.day-label {
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.ratio-bar {
+  display: flex;
+  height: 40px;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.old-food, .new-food {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.old-food {
+  background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+}
+
+.new-food {
+  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+}
+
+.transition-tips {
+  background: #f3f4f6;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-top: 1.5rem;
+}
+
+.transition-tips h4 {
+  margin: 0 0 0.75rem 0;
+  color: #374151;
+  font-size: 1rem;
+}
+
+.transition-tips ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  color: #4b5563;
+  line-height: 1.8;
+}
+
+.transition-tips li {
+  margin-bottom: 0.5rem;
+}
+
 .info-row {
   display: flex;
   align-items: center;
@@ -2879,9 +2976,67 @@
 }
 
 .todo-header h2 {
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 1rem 0;
   font-size: 1.75rem;
   font-weight: 700;
+}
+
+.date-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.nav-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.nav-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.date-display {
+  font-size: 1rem;
+  font-weight: 600;
+  min-width: 250px;
+  text-align: center;
+}
+
+.today-badge {
+  display: inline-block;
+  background: rgba(16, 185, 129, 0.9);
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  margin-left: 0.5rem;
+  font-weight: 700;
+}
+
+.jump-today-btn {
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: white;
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+  transition: all 0.2s;
+}
+
+.jump-today-btn:hover {
+  background: rgba(255, 255, 255, 0.35);
 }
 
 .todo-date {

@@ -8,27 +8,28 @@ interface DailyTodoListProps {
 }
 
 function DailyTodoList({ todoEntries, onUpdateTodo }: DailyTodoListProps) {
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [todayEntry, setTodayEntry] = useState<DailyTodoEntry | null>(null);
   const [filterCategory, setFilterCategory] = useState<string>('all');
 
   useEffect(() => {
-    // Find or create today's entry
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    // Find or create entry for selected date
+    const dateToFind = new Date(selectedDate);
+    dateToFind.setHours(0, 0, 0, 0);
     
     const existing = todoEntries.find(entry => {
       const entryDate = new Date(entry.date);
       entryDate.setHours(0, 0, 0, 0);
-      return entryDate.getTime() === today.getTime();
+      return entryDate.getTime() === dateToFind.getTime();
     });
     
     if (existing) {
       setTodayEntry(existing);
     } else {
-      // Create new entry for today
+      // Create new entry for selected date
       const newEntry: DailyTodoEntry = {
         id: Date.now().toString(),
-        date: new Date(),
+        date: new Date(selectedDate),
         items: puppyDailySchedule.map(item => ({
           scheduleItemId: item.id,
           completed: false
@@ -37,7 +38,7 @@ function DailyTodoList({ todoEntries, onUpdateTodo }: DailyTodoListProps) {
       setTodayEntry(newEntry);
       onUpdateTodo(newEntry);
     }
-  }, [todoEntries, onUpdateTodo]);
+  }, [todoEntries, onUpdateTodo, selectedDate]);
 
   const handleToggleItem = (scheduleItemId: string) => {
     if (!todayEntry) return;
@@ -98,11 +99,39 @@ function DailyTodoList({ todoEntries, onUpdateTodo }: DailyTodoListProps) {
   const stats = getCompletionStats();
   const filteredItems = filterItems();
 
+  const navigateDate = (days: number) => {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(newDate.getDate() + days);
+    setSelectedDate(newDate);
+  };
+
+  const isToday = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const selected = new Date(selectedDate);
+    selected.setHours(0, 0, 0, 0);
+    return today.getTime() === selected.getTime();
+  };
+
   return (
     <div className="daily-todo-container">
       <div className="todo-header">
-        <h2>📅 Today's Schedule</h2>
-        <div className="todo-date">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</div>
+        <h2>📅 Daily Schedule</h2>
+        
+        {/* Date Navigation */}
+        <div className="date-navigation">
+          <button onClick={() => navigateDate(-1)} className="nav-btn">◀ Prev</button>
+          <div className="date-display">
+            {selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+            {isToday() && <span className="today-badge">Today</span>}
+          </div>
+          <button onClick={() => navigateDate(1)} className="nav-btn">Next ▶</button>
+        </div>
+        {!isToday() && (
+          <button onClick={() => setSelectedDate(new Date())} className="jump-today-btn">
+            Jump to Today
+          </button>
+        )}
       </div>
 
       {/* Progress Bar */}

@@ -115,6 +115,67 @@ const FoodTracker = ({ foodEntries, onAddFoodEntry, onUpdateFeedingTime }: FoodT
           </div>
         </div>
 
+        {/* Kibble Transition Guide */}
+        <div className="kibble-transition-card">
+          <h3>🔄 Kibble Transition Plan</h3>
+          <p className="transition-intro">
+            Transitioning to <strong>Kirkland Signature Nature's Domain Puppy Formula (Chicken & Pea)</strong>
+          </p>
+          <p className="transition-warning">⚠️ Gradual transition over 7-10 days prevents digestive upset</p>
+          
+          <div className="transition-schedule">
+            <div className="transition-day">
+              <div className="day-label">Days 1-2</div>
+              <div className="ratio-info">
+                <div className="ratio-bar">
+                  <div className="old-food" style={{width: '75%'}}>75% Old</div>
+                  <div className="new-food" style={{width: '25%'}}>25% New</div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="transition-day">
+              <div className="day-label">Days 3-4</div>
+              <div className="ratio-info">
+                <div className="ratio-bar">
+                  <div className="old-food" style={{width: '50%'}}>50% Old</div>
+                  <div className="new-food" style={{width: '50%'}}>50% New</div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="transition-day">
+              <div className="day-label">Days 5-7</div>
+              <div className="ratio-info">
+                <div className="ratio-bar">
+                  <div className="old-food" style={{width: '25%'}}>25% Old</div>
+                  <div className="new-food" style={{width: '75%'}}>75% New</div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="transition-day">
+              <div className="day-label">Day 8+</div>
+              <div className="ratio-info">
+                <div className="ratio-bar">
+                  <div className="new-food" style={{width: '100%'}}>100% New Food</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="transition-tips">
+            <h4>💡 Transition Tips:</h4>
+            <ul>
+              <li>Mix foods thoroughly at each meal</li>
+              <li>Monitor for signs of digestive upset (loose stools, vomiting)</li>
+              <li>If issues occur, slow down the transition process</li>
+              <li>Keep fresh water available at all times</li>
+              <li>Maintain same feeding times and locations</li>
+            </ul>
+          </div>
+        </div>
+
         <div className="current-guidelines-summary">
           <h3>📌 Current Feeding Plan ({currentGuideline.ageRange})</h3>
           <div className="guideline-quick-view">
