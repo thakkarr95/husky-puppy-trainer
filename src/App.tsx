@@ -18,6 +18,8 @@ function App() {
   const [todoEntries, setTodoEntries] = useState<DailyTodoEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isOnline, setIsOnline] = useState(true);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
 
   // Load all data on mount
   useEffect(() => {
@@ -36,12 +38,12 @@ function App() {
     checkOnline();
     const healthInterval = setInterval(checkOnline, 30000); // Check every 30 seconds
     
-    // Sync data every 10 seconds to pick up changes from other devices
+    // Sync data every 2 seconds for near-instant updates across devices
     const syncInterval = setInterval(() => {
       if (isOnline) {
         loadAllData();
       }
-    }, 10000); // Sync every 10 seconds
+    }, 2000); // Sync every 2 seconds for real-time feel
     
     // Reload data when window regains focus (switching back to app)
     const handleFocus = () => {
@@ -69,7 +71,7 @@ function App() {
 
   const loadAllData = async () => {
     try {
-      setIsLoading(true);
+      setIsSyncing(true);
       const data = await api.syncAllData();
       
       // Merge loaded tasks with defaults
@@ -89,6 +91,7 @@ function App() {
       setFoodEntries(data.foodEntries);
       setPottyEntries(data.pottyEntries);
       setIsOnline(true);
+      setLastSyncTime(new Date());
     } catch (error) {
       console.error('Error loading data:', error);
       setIsOnline(false);
@@ -96,6 +99,7 @@ function App() {
       loadFromLocalStorage();
     } finally {
       setIsLoading(false);
+      setIsSyncing(false);
     }
   };
 
@@ -254,6 +258,23 @@ function App() {
         {!isOnline && (
           <div className="offline-banner">
             ⚠️ Offline Mode - Changes will sync when reconnected
+          </div>
+        )}
+        {isOnline && (
+          <div className="sync-status">
+            <button 
+              onClick={() => loadAllData()} 
+              className="sync-button"
+              disabled={isSyncing}
+              title="Sync now"
+            >
+              {isSyncing ? '🔄' : '↻'} {isSyncing ? 'Syncing...' : 'Sync'}
+            </button>
+            {lastSyncTime && !isSyncing && (
+              <span className="last-sync">
+                Last sync: {lastSyncTime.toLocaleTimeString()}
+              </span>
+            )}
           </div>
         )}
         <nav>

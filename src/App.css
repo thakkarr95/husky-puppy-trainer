@@ -85,6 +85,64 @@
   color: white;
 }
 
+/* Sync Status Styles */
+.sync-status {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin: 0.5rem 1rem;
+}
+
+.sync-button {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sync-button:hover:not(:disabled) {
+  background: #5568d3;
+  transform: scale(1.05);
+}
+
+.sync-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.sync-button:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.last-sync {
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.sync-button:disabled {
+  animation: spin 1s linear infinite;
+}
+
 .App main {
   max-width: 100%;
   margin: 0 auto;
