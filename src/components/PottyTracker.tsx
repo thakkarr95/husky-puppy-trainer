@@ -8,7 +8,7 @@ interface PottyTrackerProps {
 
 function PottyTracker({ pottyEntries, onAddPottyEntry }: PottyTrackerProps) {
   const [selectedType, setSelectedType] = useState<'pee' | 'poop' | 'both'>('pee');
-  const [selectedLocation, setSelectedLocation] = useState<'outside' | 'inside' | 'accident'>('outside');
+  const [selectedLocation, setSelectedLocation] = useState<'outside' | 'inside'>('outside');
   const [notes, setNotes] = useState('');
 
   // Get today's entries
@@ -38,7 +38,7 @@ function PottyTracker({ pottyEntries, onAddPottyEntry }: PottyTrackerProps) {
 
   const weekStats = {
     outside: weekEntries.filter(e => e.location === 'outside').length,
-    accidents: weekEntries.filter(e => e.location === 'accident' || e.location === 'inside').length,
+    accidents: weekEntries.filter(e => e.location === 'inside').length,
     successRate: weekEntries.length > 0 
       ? Math.round((weekEntries.filter(e => e.location === 'outside').length / weekEntries.length) * 100)
       : 0
@@ -75,8 +75,7 @@ function PottyTracker({ pottyEntries, onAddPottyEntry }: PottyTrackerProps) {
   const getLocationColor = (location: string) => {
     switch (location) {
       case 'outside': return '#10b981';
-      case 'inside': return '#f59e0b';
-      case 'accident': return '#ef4444';
+      case 'inside': return '#ef4444';
       default: return '#6b7280';
     }
   };
@@ -84,8 +83,7 @@ function PottyTracker({ pottyEntries, onAddPottyEntry }: PottyTrackerProps) {
   const getLocationLabel = (location: string) => {
     switch (location) {
       case 'outside': return '✓ Outside';
-      case 'inside': return '⚠ Inside';
-      case 'accident': return '✗ Accident';
+      case 'inside': return '✗ Inside/Accident';
       default: return location;
     }
   };
@@ -162,15 +160,8 @@ function PottyTracker({ pottyEntries, onAddPottyEntry }: PottyTrackerProps) {
                   className={`location-btn location-inside ${selectedLocation === 'inside' ? 'active' : ''}`}
                   onClick={() => setSelectedLocation('inside')}
                 >
-                  <span className="btn-emoji">⚠</span>
-                  <span>Inside</span>
-                </button>
-                <button
-                  className={`location-btn location-accident ${selectedLocation === 'accident' ? 'active' : ''}`}
-                  onClick={() => setSelectedLocation('accident')}
-                >
                   <span className="btn-emoji">✗</span>
-                  <span>Accident</span>
+                  <span>Inside/Accident</span>
                 </button>
               </div>
             </div>

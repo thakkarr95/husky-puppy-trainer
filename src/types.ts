@@ -24,7 +24,7 @@ export interface PottyEntry {
   date: Date;
   time: string;
   type: 'pee' | 'poop' | 'both';
-  location: 'outside' | 'inside' | 'accident';
+  location: 'outside' | 'inside';
   notes?: string;
 }
 
