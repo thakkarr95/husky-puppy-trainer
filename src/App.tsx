@@ -165,9 +165,6 @@ function App() {
 }
 
 export default App
-
-  const handleExport = () => {
-    const dataToExport = {
       tasks,
       foodEntries,
     };
