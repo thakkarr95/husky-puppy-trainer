@@ -262,6 +262,7 @@ function App() {
   };
 
   const handleQuickLogFood = () => {
+    console.log('Quick log food clicked');
     // Create a food entry for current time
     const now = new Date();
     const currentAge = Math.floor((now.getTime() - new Date('2025-09-13').getTime()) / (1000 * 60 * 60 * 24 * 7));
@@ -278,8 +279,12 @@ function App() {
       notes: 'Logged from daily schedule'
     };
     
+    console.log('Creating food entry:', newEntry);
     // Use the existing handler which already does optimistic update
     handleAddFoodEntry(newEntry);
+    
+    // Show feedback
+    alert('Feed logged! ✓\nSwitch to Food tab to see details.');
   };
 
   const handleQuickLogPotty = (type: 'pee' | 'poop' | 'both', location: 'outside' | 'inside') => {
