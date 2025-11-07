@@ -278,19 +278,30 @@ function App() {
       return;
     }
     
-    // Find all schedule items matching the category
-    const categoryScheduleIds = puppyDailySchedule
+    // Find all schedule items matching the category, ordered by time
+    const categoryScheduleItems = puppyDailySchedule
       .filter(item => item.category === category)
-      .map(item => item.id);
+      .sort((a, b) => {
+        // Sort by time (convert "7:00 AM" format to comparable values)
+        const timeA = new Date(`2000-01-01 ${a.time}`).getTime();
+        const timeB = new Date(`2000-01-01 ${b.time}`).getTime();
+        return timeA - timeB;
+      });
     
-    // Mark all matching items as completed
+    // Find the FIRST uncompleted item of this category
+    let markedOne = false;
     const updatedItems = todayEntry.items.map(item => {
-      if (categoryScheduleIds.includes(item.scheduleItemId) && !item.completed) {
-        return {
-          ...item,
-          completed: true,
-          completedAt: new Date()
-        };
+      if (!markedOne && !item.completed) {
+        // Check if this item matches one of the category schedule items
+        const matchesCategory = categoryScheduleItems.some(schedItem => schedItem.id === item.scheduleItemId);
+        if (matchesCategory) {
+          markedOne = true;
+          return {
+            ...item,
+            completed: true,
+            completedAt: new Date()
+          };
+        }
       }
       return item;
     });
