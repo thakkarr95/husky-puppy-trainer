@@ -5,6 +5,7 @@ import PottyTracker from './components/PottyTracker';
 import DailyTodoList from './components/DailyTodoList';
 import type { TrainingTask, FoodEntry, PottyEntry, DailyTodoEntry } from './types';
 import { weeklyTraining } from './trainingData';
+import { puppyDailySchedule } from './dailyScheduleData';
 import * as api from './api';
 import './App.css';
 
@@ -277,33 +278,30 @@ function App() {
       return;
     }
     
-    // Import the schedule data to match categories
-    import('./dailyScheduleData').then(({ puppyDailySchedule }) => {
-      // Find all schedule items matching the category
-      const categoryScheduleIds = puppyDailySchedule
-        .filter(item => item.category === category)
-        .map(item => item.id);
-      
-      // Mark all matching items as completed
-      const updatedItems = todayEntry.items.map(item => {
-        if (categoryScheduleIds.includes(item.scheduleItemId) && !item.completed) {
-          return {
-            ...item,
-            completed: true,
-            completedAt: new Date()
-          };
-        }
-        return item;
-      });
-      
-      // Update the todo entry
-      const updatedEntry: DailyTodoEntry = {
-        ...todayEntry,
-        items: updatedItems
-      };
-      
-      handleUpdateTodo(updatedEntry);
+    // Find all schedule items matching the category
+    const categoryScheduleIds = puppyDailySchedule
+      .filter(item => item.category === category)
+      .map(item => item.id);
+    
+    // Mark all matching items as completed
+    const updatedItems = todayEntry.items.map(item => {
+      if (categoryScheduleIds.includes(item.scheduleItemId) && !item.completed) {
+        return {
+          ...item,
+          completed: true,
+          completedAt: new Date()
+        };
+      }
+      return item;
     });
+    
+    // Update the todo entry
+    const updatedEntry: DailyTodoEntry = {
+      ...todayEntry,
+      items: updatedItems
+    };
+    
+    handleUpdateTodo(updatedEntry);
   };
 
   const handleQuickLogFood = () => {
