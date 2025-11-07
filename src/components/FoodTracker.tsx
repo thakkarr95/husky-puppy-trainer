@@ -9,9 +9,10 @@ interface FoodTrackerProps {
 }
 
 const FoodTracker = ({ foodEntries, onAddFoodEntry, onUpdateFeedingTime }: FoodTrackerProps) => {
-  // Fixed puppy pickup date - 11/8/2025
+  // Fixed puppy birth date - 09/13/2025 (pickup date is 11/8/2025 at 8 weeks old)
+  const PUPPY_BIRTH_DATE = new Date('2025-09-13T00:00:00');
   const PUPPY_PICKUP_DATE = new Date('2025-11-08T00:00:00');
-  const [puppyBirthDate] = useState<Date>(PUPPY_PICKUP_DATE);
+  const [puppyBirthDate] = useState<Date>(PUPPY_BIRTH_DATE);
   const [currentPuppyAge, setCurrentPuppyAge] = useState(8);
   const [todayEntry, setTodayEntry] = useState<FoodEntry | null>(null);
   const [showAllGuidelines, setShowAllGuidelines] = useState(false);
@@ -77,14 +78,25 @@ const FoodTracker = ({ foodEntries, onAddFoodEntry, onUpdateFeedingTime }: FoodT
         <div className="puppy-info-card">
           <h3>🐺 Puppy Information</h3>
           <div className="info-row">
-            <label>Pickup Date (8 weeks old):</label>
+            <label>Birth Date:</label>
             <input
               type="date"
               value={puppyBirthDate.toISOString().split('T')[0]}
               readOnly
               disabled
               className="date-input"
-              title="Puppy pickup date: November 8, 2025"
+              title="Puppy birth date: September 13, 2025"
+            />
+          </div>
+          <div className="info-row">
+            <label>Pickup Date:</label>
+            <input
+              type="date"
+              value={PUPPY_PICKUP_DATE.toISOString().split('T')[0]}
+              readOnly
+              disabled
+              className="date-input"
+              title="Puppy pickup date: November 8, 2025 (8 weeks old)"
             />
           </div>
           <div className="info-stats">
