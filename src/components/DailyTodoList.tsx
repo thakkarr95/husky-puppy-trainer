@@ -5,8 +5,8 @@ import { puppyDailySchedule } from '../dailyScheduleData';
 interface DailyTodoListProps {
   todoEntries: DailyTodoEntry[];
   onUpdateTodo: (entry: DailyTodoEntry) => void;
-  onQuickLogFood?: () => void;
-  onQuickLogPotty?: (type: 'pee' | 'poop' | 'both', location: 'outside' | 'inside') => void;
+  onQuickLogFood?: (scheduleItemId: string) => void;
+  onQuickLogPotty?: (scheduleItemId: string, type: 'pee' | 'poop' | 'both', location: 'outside' | 'inside') => void;
 }
 
 function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPotty }: DailyTodoListProps) {
@@ -237,7 +237,7 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
                       className="quick-log-btn food-log"
                       onClick={(e) => {
                         e.stopPropagation();
-                        onQuickLogFood();
+                        onQuickLogFood(item.id);
                       }}
                     >
                       🍖 Log Feed
@@ -271,7 +271,7 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
                           className="quick-log-btn potty-pee"
                           onClick={(e) => {
                             e.stopPropagation();
-                            onQuickLogPotty('pee', pottyLocation);
+                            onQuickLogPotty(item.id, 'pee', pottyLocation);
                           }}
                         >
                           💧 Pee
@@ -280,7 +280,7 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
                           className="quick-log-btn potty-poop"
                           onClick={(e) => {
                             e.stopPropagation();
-                            onQuickLogPotty('poop', pottyLocation);
+                            onQuickLogPotty(item.id, 'poop', pottyLocation);
                           }}
                         >
                           💩 Poop
@@ -289,7 +289,7 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
                           className="quick-log-btn potty-both"
                           onClick={(e) => {
                             e.stopPropagation();
-                            onQuickLogPotty('both', pottyLocation);
+                            onQuickLogPotty(item.id, 'both', pottyLocation);
                           }}
                         >
                           💧💩 Both

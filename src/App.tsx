@@ -5,7 +5,6 @@ import PottyTracker from './components/PottyTracker';
 import DailyTodoList from './components/DailyTodoList';
 import type { TrainingTask, FoodEntry, PottyEntry, DailyTodoEntry } from './types';
 import { weeklyTraining } from './trainingData';
-import { puppyDailySchedule } from './dailyScheduleData';
 import * as api from './api';
 import './App.css';
 
@@ -262,7 +261,7 @@ function App() {
     setIsSavingTodo(false);
   };
 
-  const markTodosCompleted = (category: 'Feeding' | 'Potty') => {
+  const markTodosCompleted = (scheduleItemId: string) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
@@ -278,30 +277,14 @@ function App() {
       return;
     }
     
-    // Find all schedule items matching the category, ordered by time
-    const categoryScheduleItems = puppyDailySchedule
-      .filter(item => item.category === category)
-      .sort((a, b) => {
-        // Sort by time (convert "7:00 AM" format to comparable values)
-        const timeA = new Date(`2000-01-01 ${a.time}`).getTime();
-        const timeB = new Date(`2000-01-01 ${b.time}`).getTime();
-        return timeA - timeB;
-      });
-    
-    // Find the FIRST uncompleted item of this category
-    let markedOne = false;
+    // Mark the specific item as completed
     const updatedItems = todayEntry.items.map(item => {
-      if (!markedOne && !item.completed) {
-        // Check if this item matches one of the category schedule items
-        const matchesCategory = categoryScheduleItems.some(schedItem => schedItem.id === item.scheduleItemId);
-        if (matchesCategory) {
-          markedOne = true;
-          return {
-            ...item,
-            completed: true,
-            completedAt: new Date()
-          };
-        }
+      if (item.scheduleItemId === scheduleItemId && !item.completed) {
+        return {
+          ...item,
+          completed: true,
+          completedAt: new Date()
+        };
       }
       return item;
     });
@@ -315,8 +298,8 @@ function App() {
     handleUpdateTodo(updatedEntry);
   };
 
-  const handleQuickLogFood = () => {
-    console.log('Quick log food clicked');
+  const handleQuickLogFood = (scheduleItemId: string) => {
+    console.log('Quick log food clicked for item:', scheduleItemId);
     // Create a food entry for current time
     const now = new Date();
     const currentAge = Math.floor((now.getTime() - new Date('2025-09-13').getTime()) / (1000 * 60 * 60 * 24 * 7));
@@ -337,14 +320,15 @@ function App() {
     // Use the existing handler which already does optimistic update
     handleAddFoodEntry(newEntry);
     
-    // Mark feeding todos as completed
-    markTodosCompleted('Feeding');
+    // Mark this specific todo item as completed
+    markTodosCompleted(scheduleItemId);
     
     // Show feedback
     alert('Feed logged! ✓\nSwitch to Food tab to see details.');
   };
 
-  const handleQuickLogPotty = (type: 'pee' | 'poop' | 'both', location: 'outside' | 'inside') => {
+  const handleQuickLogPotty = (scheduleItemId: string, type: 'pee' | 'poop' | 'both', location: 'outside' | 'inside') => {
+    console.log('Quick log potty clicked for item:', scheduleItemId);
     // Create a potty entry for current time
     const now = new Date();
     const timeString = now.toLocaleTimeString('en-US', { 
@@ -364,8 +348,8 @@ function App() {
     // Use the existing handler which already does optimistic update
     handleAddPottyEntry(entryWithoutId);
     
-    // Mark potty todos as completed
-    markTodosCompleted('Potty');
+    // Mark this specific todo item as completed
+    markTodosCompleted(scheduleItemId);
   };
 
   if (isLoading) {
