@@ -13,7 +13,7 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [todayEntry, setTodayEntry] = useState<DailyTodoEntry | null>(null);
   const [filterCategory, setFilterCategory] = useState<string>('all');
-  const [pottyLocation, setPottyLocation] = useState<'outside' | 'inside'>('outside');
+  const [pottyLocations, setPottyLocations] = useState<Record<string, 'outside' | 'inside'>>({});
 
   useEffect(() => {
     // Find or create entry for selected date
@@ -248,19 +248,19 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
                     <div className="quick-potty-section">
                       <div className="potty-location-selector">
                         <button 
-                          className={`location-toggle ${pottyLocation === 'outside' ? 'active' : ''}`}
+                          className={`location-toggle ${(pottyLocations[item.id] || 'outside') === 'outside' ? 'active' : ''}`}
                           onClick={(e) => {
                             e.stopPropagation();
-                            setPottyLocation('outside');
+                            setPottyLocations(prev => ({ ...prev, [item.id]: 'outside' }));
                           }}
                         >
                           ✓ Outside
                         </button>
                         <button 
-                          className={`location-toggle ${pottyLocation === 'inside' ? 'active' : ''}`}
+                          className={`location-toggle ${(pottyLocations[item.id] || 'outside') === 'inside' ? 'active' : ''}`}
                           onClick={(e) => {
                             e.stopPropagation();
-                            setPottyLocation('inside');
+                            setPottyLocations(prev => ({ ...prev, [item.id]: 'inside' }));
                           }}
                         >
                           ✗ Accident
@@ -271,7 +271,7 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
                           className="quick-log-btn potty-pee"
                           onClick={(e) => {
                             e.stopPropagation();
-                            onQuickLogPotty(item.id, 'pee', pottyLocation);
+                            onQuickLogPotty(item.id, 'pee', pottyLocations[item.id] || 'outside');
                           }}
                         >
                           💧 Pee
@@ -280,7 +280,7 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
                           className="quick-log-btn potty-poop"
                           onClick={(e) => {
                             e.stopPropagation();
-                            onQuickLogPotty(item.id, 'poop', pottyLocation);
+                            onQuickLogPotty(item.id, 'poop', pottyLocations[item.id] || 'outside');
                           }}
                         >
                           💩 Poop
@@ -289,7 +289,7 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
                           className="quick-log-btn potty-both"
                           onClick={(e) => {
                             e.stopPropagation();
-                            onQuickLogPotty(item.id, 'both', pottyLocation);
+                            onQuickLogPotty(item.id, 'both', pottyLocations[item.id] || 'outside');
                           }}
                         >
                           💧💩 Both
