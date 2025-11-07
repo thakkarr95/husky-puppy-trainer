@@ -1,24 +1,18 @@
-import { useState, useEffect } from 'react'
-import WeeklySchedule from './components/WeeklySchedule'
-import FoodTracker from './components/FoodTracker'
-import type { TrainingTask, FoodEntry } from './types'
-import { useLocalStorage, mergeWithDefaults } from './hooks/useLocalStorage'
-import { trainingTasks } from './data'
-import './App.css'
+import { useState, useEffect } from 'react';
+import WeeklySchedule from './components/WeeklySchedule';
+import FoodTracker from './components/FoodTracker';
+import type { TrainingTask, FoodEntry } from './types';
+import { useLocalStorage } from './hooks/useLocalStorage';
+import { weeklyTraining } from './trainingData';
+import './App.css';
 
 type TabType = 'schedule' | 'food';
 
 function App() {
   const [activeTab, setActiveTab] = useState<TabType>('schedule');
-  const [savedTasks, saveTasks] = useLocalStorage();
-  const [tasks, setTasks] = useState<TrainingTask[]>([]);
+  const [currentWeek, setCurrentWeek] = useState(1);
+  const [tasksByWeek, setTasksByWeek] = useLocalStorage('husky-weekly-tasks', weeklyTraining);
   const [foodEntries, setFoodEntries] = useState<FoodEntry[]>([]);
-
-  // Initialize tasks on component mount
-  useEffect(() => {
-    const initialTasks = mergeWithDefaults(savedTasks, trainingTasks);
-    setTasks(initialTasks);
-  }, [savedTasks]);
 
   // Load food entries from localStorage
   useEffect(() => {
@@ -38,8 +32,11 @@ function App() {
   }, []);
 
   const handleTasksUpdate = (updatedTasks: TrainingTask[]) => {
-    setTasks(updatedTasks);
-    saveTasks(updatedTasks);
+    const updatedTasksByWeek = {
+      ...tasksByWeek,
+      [currentWeek]: updatedTasks,
+    };
+    setTasksByWeek(updatedTasksByWeek);
   };
 
   const handleAddFoodEntry = (entry: FoodEntry) => {
@@ -61,99 +58,44 @@ function App() {
     localStorage.setItem('husky-food-entries', JSON.stringify(updatedEntries));
   };
 
-  const handleExport = () => {
-    const dataToExport = {
-      tasks,
-      foodEntries,
-    };
-    const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
-      JSON.stringify(dataToExport, null, 2)
-    )}`;
-    const link = document.createElement("a");
-    link.href = jsonString;
-    link.download = "puppy-progress.json";
-    link.click();
-  };
-
-  const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const text = e.target?.result;
-        if (typeof text !== 'string') return;
-        const importedData = JSON.parse(text);
-
-        if (importedData.tasks) {
-          const importedTasks = mergeWithDefaults(importedData.tasks, trainingTasks);
-          setTasks(importedTasks);
-          saveTasks(importedTasks);
-        }
-
-        if (importedData.foodEntries) {
-          const entriesWithDates = importedData.foodEntries.map((entry: any) => ({
-            ...entry,
-            date: new Date(entry.date)
-          }));
-          setFoodEntries(entriesWithDates);
-          localStorage.setItem('husky-food-entries', JSON.stringify(entriesWithDates));
-        }
-        alert('Progress imported successfully!');
-      } catch (error) {
-        console.error("Error importing data:", error);
-        alert('Failed to import progress. Please check the file format.');
-      }
-    };
-    reader.readAsText(file);
-  };
+  const tasksForCurrentWeek = tasksByWeek[currentWeek] || [];
 
   return (
-    <div className="app">
-      <nav className="app-nav">
-        <div className="nav-header">
-          <h1>🐕 Husky Puppy Trainer</h1>
-          <p>Complete training solution for your husky puppy</p>
-          <div className="io-buttons">
-            <button onClick={handleExport} className="io-button">Export Progress</button>
-            <input 
-              type="file" 
-              id="import-file" 
-              onChange={handleImport} 
-              style={{ display: 'none' }} 
-              accept=".json"
-            />
-            <label htmlFor="import-file" className="io-button">
-              Import Progress
-            </label>
-          </div>
-        </div>
-        <div className="nav-tabs">
-          <button 
-            className={`nav-tab ${activeTab === 'schedule' ? 'active' : ''}`}
-            onClick={() => setActiveTab('schedule')}
-          >
-             Training Program
+    <div className="App">
+      <header>
+        <h1>Husky Puppy Trainer</h1>
+        <nav>
+          <button onClick={() => setActiveTab('schedule')} className={activeTab === 'schedule' ? 'active' : ''}>
+            Training Schedule
           </button>
-          <button 
-            className={`nav-tab ${activeTab === 'food' ? 'active' : ''}`}
-            onClick={() => setActiveTab('food')}
-          >
-            🍽️ Food Tracker
+          <button onClick={() => setActiveTab('food')} className={activeTab === 'food' ? 'active' : ''}>
+            Food Tracker
           </button>
-        </div>
-      </nav>
-
-      <main className="app-main">
+        </nav>
+      </header>
+      <main>
         {activeTab === 'schedule' && (
-          <WeeklySchedule 
-            tasks={tasks}
-            onTasksUpdate={handleTasksUpdate}
-          />
+          <>
+            <div className="week-selector">
+              <h2>Select Week:</h2>
+              {Object.keys(weeklyTraining).map(week => (
+                <button
+                  key={week}
+                  onClick={() => setCurrentWeek(Number(week))}
+                  className={currentWeek === Number(week) ? 'active' : ''}
+                >
+                  Week {week}
+                </button>
+              ))}
+            </div>
+            <WeeklySchedule
+              tasks={tasksForCurrentWeek}
+              onTasksUpdate={handleTasksUpdate}
+            />
+          </>
         )}
         {activeTab === 'food' && (
-          <FoodTracker 
+          <FoodTracker
             foodEntries={foodEntries}
             onAddFoodEntry={handleAddFoodEntry}
             onUpdateFeedingTime={handleUpdateFeedingTime}
@@ -161,287 +103,7 @@ function App() {
         )}
       </main>
     </div>
-  )
+  );
 }
 
-export default App
-      tasks,
-      foodEntries,
-    };
-    const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
-      JSON.stringify(dataToExport, null, 2)
-    )}`;
-    const link = document.createElement("a");
-    link.href = jsonString;
-    link.download = "puppy-progress.json";
-    link.click();
-  };
-
-  const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const text = e.target?.result;
-        if (typeof text !== 'string') return;
-        const importedData = JSON.parse(text);
-
-        if (importedData.tasks) {
-          const importedTasks = mergeWithDefaults(importedData.tasks, trainingTasks);
-          setTasks(importedTasks);
-          saveTasks(importedTasks);
-        }
-
-        if (importedData.foodEntries) {
-          const entriesWithDates = importedData.foodEntries.map((entry: any) => ({
-            ...entry,
-            date: new Date(entry.date)
-          }));
-          setFoodEntries(entriesWithDates);
-          localStorage.setItem('husky-food-entries', JSON.stringify(entriesWithDates));
-        }
-        alert('Progress imported successfully!');
-      } catch (error) {
-        console.error("Error importing data:", error);
-        alert('Failed to import progress. Please check the file format.');
-      }
-    };
-    reader.readAsText(file);
-  };
-
-  return (
-    <div className="app">
-      <nav className="app-nav">
-        <div className="nav-header">
-          <h1>🐕 Husky Puppy Trainer</h1>
-          <p>Complete training solution for your husky puppy</p>
-          <div className="io-buttons">
-            <button onClick={handleExport} className="io-button">Export Progress</button>
-            <input 
-              type="file" 
-              id="import-file" 
-              onChange={handleImport} 
-              style={{ display: 'none' }} 
-              accept=".json"
-            />
-            <label htmlFor="import-file" className="io-button">
-              Import Progress
-            </label>
-          </div>
-        </div>
-        <div className="nav-tabs">
-          <button 
-            className={`nav-tab ${activeTab === 'schedule' ? 'active' : ''}`}
-            onClick={() => setActiveTab('schedule')}
-          >
-             Training Program
-          </button>
-          <button 
-            className={`nav-tab ${activeTab === 'food' ? 'active' : ''}`}
-            onClick={() => setActiveTab('food')}
-          >
-            🍽️ Food Tracker
-          </button>
-        </div>
-      </nav>
-
-      <main className="app-main">
-        {activeTab === 'schedule' && (
-          <WeeklySchedule 
-            tasks={tasks}
-            onTasksUpdate={handleTasksUpdate}
-          />
-        )}
-        {activeTab === 'food' && (
-          <FoodTracker 
-            foodEntries={foodEntries}
-            onAddFoodEntry={handleAddFoodEntry}
-            onUpdateFeedingTime={handleUpdateFeedingTime}
-          />
-        )}
-      </main>
-    </div>
-  )
-}
-
-export default App
-
-  const handleExport = () => {
-    const dataToExport = {
-      tasks,
-      foodEntries,
-    };
-    const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
-      JSON.stringify(dataToExport, null, 2)
-    )}`;
-    const link = document.createElement("a");
-    link.href = jsonString;
-    link.download = "puppy-progress.json";
-    link.click();
-  };
-
-  const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const text = e.target?.result;
-        if (typeof text !== 'string') return;
-        const importedData = JSON.parse(text);
-
-        if (importedData.tasks) {
-          const importedTasks = mergeWithDefaults(importedData.tasks, trainingTasks);
-          setTasks(importedTasks);
-          saveTasks(importedTasks);
-        }
-
-        if (importedData.foodEntries) {
-          const entriesWithDates = importedData.foodEntries.map((entry: any) => ({
-            ...entry,
-            date: new Date(entry.date)
-          }));
-          setFoodEntries(entriesWithDates);
-          localStorage.setItem('husky-food-entries', JSON.stringify(entriesWithDates));
-        }
-        alert('Progress imported successfully!');
-      } catch (error) {
-        console.error("Error importing data:", error);
-        alert('Failed to import progress. Please check the file format.');
-      }
-    };
-    reader.readAsText(file);
-  };
-
-  return (
-    <div className="app">
-      <nav className="app-nav">
-        <div className="nav-header">
-          <h1>🐕 Husky Puppy Trainer</h1>
-          <p>Complete training solution for your husky puppy</p>
-          <div className="io-buttons">
-            <button onClick={handleExport} className="io-button">Export Progress</button>
-            <input 
-              type="file" 
-              id="import-file" 
-              onChange={handleImport} 
-              style={{ display: 'none' }} 
-              accept=".json"
-            />
-            <label htmlFor="import-file" className="io-button">
-              Import Progress
-            </label>
-          </div>
-        </div>
-        <div className="nav-tabs">
-          <button 
-            className={`nav-tab ${activeTab === 'schedule' ? 'active' : ''}`}
-            onClick={() => setActiveTab('schedule')}
-
-  const handleExport = () => {
-    const dataToExport = {
-      tasks,
-      foodEntries,
-    };
-    const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
-      JSON.stringify(dataToExport, null, 2)
-    )}`;
-    const link = document.createElement("a");
-    link.href = jsonString;
-    link.download = "puppy-progress.json";
-    link.click();
-  };
-
-  const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const text = e.target?.result;
-        if (typeof text !== 'string') return;
-        const importedData = JSON.parse(text);
-
-        if (importedData.tasks) {
-          const importedTasks = mergeWithDefaults(importedData.tasks, trainingTasks);
-          setTasks(importedTasks);
-          saveTasks(importedTasks);
-        }
-
-        if (importedData.foodEntries) {
-          const entriesWithDates = importedData.foodEntries.map((entry: any) => ({
-            ...entry,
-            date: new Date(entry.date)
-          }));
-          setFoodEntries(entriesWithDates);
-          localStorage.setItem('husky-food-entries', JSON.stringify(entriesWithDates));
-        }
-        alert('Progress imported successfully!');
-      } catch (error) {
-        console.error("Error importing data:", error);
-        alert('Failed to import progress. Please check the file format.');
-      }
-    };
-    reader.readAsText(file);
-  };
-
-  return (
-    <div className="app">
-      <nav className="app-nav">
-        <div className="nav-header">
-          <h1>🐕 Husky Puppy Trainer</h1>
-          <p>Complete training solution for your husky puppy</p>
-          <div className="io-buttons">
-            <button onClick={handleExport} className="io-button">Export Progress</button>
-            <input 
-              type="file" 
-              id="import-file" 
-              onChange={handleImport} 
-              style={{ display: 'none' }} 
-              accept=".json"
-            />
-            <label htmlFor="import-file" className="io-button">
-              Import Progress
-            </label>
-          </div>
-        </div>
-        <div className="nav-tabs">
-          <button 
-            className={`nav-tab ${activeTab === 'schedule' ? 'active' : ''}`}
-            onClick={() => setActiveTab('schedule')}
-          >
-            � Training Program
-          </button>
-          <button 
-            className={`nav-tab ${activeTab === 'food' ? 'active' : ''}`}
-            onClick={() => setActiveTab('food')}
-          >
-            🍽️ Food Tracker
-          </button>
-        </div>
-      </nav>
-
-      <main className="app-main">
-        {activeTab === 'schedule' && (
-          <WeeklySchedule 
-            tasks={tasks}
-            onTasksUpdate={handleTasksUpdate}
-          />
-        )}
-        {activeTab === 'food' && (
-          <FoodTracker 
-            foodEntries={foodEntries}
-            onAddFoodEntry={handleAddFoodEntry}
-            onUpdateFeedingTime={handleUpdateFeedingTime}
-          />
-        )}
-      </main>
-    </div>
-  )
-}
-
-export default App
+export default App;
