@@ -261,6 +261,51 @@ function App() {
     setIsSavingTodo(false);
   };
 
+  const markTodosCompleted = (category: 'Feeding' | 'Potty') => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Find today's todo entry
+    const todayEntry = todoEntries.find(entry => {
+      const entryDate = new Date(entry.date);
+      entryDate.setHours(0, 0, 0, 0);
+      return entryDate.getTime() === today.getTime();
+    });
+    
+    if (!todayEntry) {
+      console.log('No todo entry found for today');
+      return;
+    }
+    
+    // Import the schedule data to match categories
+    import('./dailyScheduleData').then(({ puppyDailySchedule }) => {
+      // Find all schedule items matching the category
+      const categoryScheduleIds = puppyDailySchedule
+        .filter(item => item.category === category)
+        .map(item => item.id);
+      
+      // Mark all matching items as completed
+      const updatedItems = todayEntry.items.map(item => {
+        if (categoryScheduleIds.includes(item.scheduleItemId) && !item.completed) {
+          return {
+            ...item,
+            completed: true,
+            completedAt: new Date()
+          };
+        }
+        return item;
+      });
+      
+      // Update the todo entry
+      const updatedEntry: DailyTodoEntry = {
+        ...todayEntry,
+        items: updatedItems
+      };
+      
+      handleUpdateTodo(updatedEntry);
+    });
+  };
+
   const handleQuickLogFood = () => {
     console.log('Quick log food clicked');
     // Create a food entry for current time
@@ -282,6 +327,9 @@ function App() {
     console.log('Creating food entry:', newEntry);
     // Use the existing handler which already does optimistic update
     handleAddFoodEntry(newEntry);
+    
+    // Mark feeding todos as completed
+    markTodosCompleted('Feeding');
     
     // Show feedback
     alert('Feed logged! ✓\nSwitch to Food tab to see details.');
@@ -306,6 +354,9 @@ function App() {
     
     // Use the existing handler which already does optimistic update
     handleAddPottyEntry(entryWithoutId);
+    
+    // Mark potty todos as completed
+    markTodosCompleted('Potty');
   };
 
   if (isLoading) {
