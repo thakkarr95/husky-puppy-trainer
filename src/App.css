@@ -3407,10 +3407,53 @@
   width: 100%;
 }
 
+.quick-potty-section {
+  margin-top: 0.5rem;
+}
+
+.potty-location-selector {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.location-toggle {
+  flex: 1;
+  padding: 0.5rem;
+  border: 2px solid #e5e7eb;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6b7280;
+  transition: all 0.2s ease;
+}
+
+.location-toggle:hover {
+  background: #f9fafb;
+}
+
+.location-toggle.active {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-color: #10b981;
+  color: white;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+}
+
+.location-toggle:first-child.active {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.location-toggle:last-child.active {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  border-color: #ef4444;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
 .quick-potty-buttons {
   display: flex;
   gap: 0.5rem;
-  margin-top: 0.5rem;
 }
 
 .potty-pee {

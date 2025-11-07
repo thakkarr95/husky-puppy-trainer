@@ -6,13 +6,14 @@ interface DailyTodoListProps {
   todoEntries: DailyTodoEntry[];
   onUpdateTodo: (entry: DailyTodoEntry) => void;
   onQuickLogFood?: () => void;
-  onQuickLogPotty?: (type: 'pee' | 'poop' | 'both') => void;
+  onQuickLogPotty?: (type: 'pee' | 'poop' | 'both', location: 'outside' | 'inside') => void;
 }
 
 function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPotty }: DailyTodoListProps) {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [todayEntry, setTodayEntry] = useState<DailyTodoEntry | null>(null);
   const [filterCategory, setFilterCategory] = useState<string>('all');
+  const [pottyLocation, setPottyLocation] = useState<'outside' | 'inside'>('outside');
 
   useEffect(() => {
     // Find or create entry for selected date
@@ -244,34 +245,56 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
                   )}
                   
                   {canEdit && item.category === 'Potty' && onQuickLogPotty && (
-                    <div className="quick-potty-buttons">
-                      <button 
-                        className="quick-log-btn potty-pee"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onQuickLogPotty('pee');
-                        }}
-                      >
-                        💧 Pee
-                      </button>
-                      <button 
-                        className="quick-log-btn potty-poop"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onQuickLogPotty('poop');
-                        }}
-                      >
-                        💩 Poop
-                      </button>
-                      <button 
-                        className="quick-log-btn potty-both"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onQuickLogPotty('both');
-                        }}
-                      >
-                        💧💩 Both
-                      </button>
+                    <div className="quick-potty-section">
+                      <div className="potty-location-selector">
+                        <button 
+                          className={`location-toggle ${pottyLocation === 'outside' ? 'active' : ''}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPottyLocation('outside');
+                          }}
+                        >
+                          ✓ Outside
+                        </button>
+                        <button 
+                          className={`location-toggle ${pottyLocation === 'inside' ? 'active' : ''}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPottyLocation('inside');
+                          }}
+                        >
+                          ✗ Accident
+                        </button>
+                      </div>
+                      <div className="quick-potty-buttons">
+                        <button 
+                          className="quick-log-btn potty-pee"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onQuickLogPotty('pee', pottyLocation);
+                          }}
+                        >
+                          💧 Pee
+                        </button>
+                        <button 
+                          className="quick-log-btn potty-poop"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onQuickLogPotty('poop', pottyLocation);
+                          }}
+                        >
+                          💩 Poop
+                        </button>
+                        <button 
+                          className="quick-log-btn potty-both"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onQuickLogPotty('both', pottyLocation);
+                          }}
+                        >
+                          💧💩 Both
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>

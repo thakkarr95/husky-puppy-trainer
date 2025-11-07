@@ -278,10 +278,11 @@ function App() {
       notes: 'Logged from daily schedule'
     };
     
+    // Use the existing handler which already does optimistic update
     handleAddFoodEntry(newEntry);
   };
 
-  const handleQuickLogPotty = (type: 'pee' | 'poop' | 'both') => {
+  const handleQuickLogPotty = (type: 'pee' | 'poop' | 'both', location: 'outside' | 'inside') => {
     // Create a potty entry for current time
     const now = new Date();
     const timeString = now.toLocaleTimeString('en-US', { 
@@ -290,16 +291,16 @@ function App() {
       hour12: true 
     });
     
-    const newEntry: PottyEntry = {
-      id: Date.now().toString(),
+    const entryWithoutId = {
       date: now,
       time: timeString,
       type: type,
-      location: 'outside', // Default to outside
+      location: location,
       notes: 'Logged from daily schedule'
     };
     
-    handleAddPottyEntry(newEntry);
+    // Use the existing handler which already does optimistic update
+    handleAddPottyEntry(entryWithoutId);
   };
 
   if (isLoading) {
