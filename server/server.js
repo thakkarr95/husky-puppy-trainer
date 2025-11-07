@@ -1,0 +1,210 @@
+import express from 'express';
+import cors from 'cors';
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const app = express();
+const PORT = process.env.PORT || 3001;
+const DATA_DIR = path.join(__dirname, 'data');
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// Ensure data directory exists
+async function initDataDir() {
+  try {
+    await fs.access(DATA_DIR);
+  } catch {
+    await fs.mkdir(DATA_DIR, { recursive: true });
+  }
+}
+
+// Helper function to read data file
+async function readDataFile(filename) {
+  const filePath = path.join(DATA_DIR, filename);
+  try {
+    const data = await fs.readFile(filePath, 'utf-8');
+    return JSON.parse(data);
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      return null; // File doesn't exist yet
+    }
+    throw error;
+  }
+}
+
+// Helper function to write data file
+async function writeDataFile(filename, data) {
+  const filePath = path.join(DATA_DIR, filename);
+  await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf-8');
+}
+
+// ===== TRAINING TASKS ENDPOINTS =====
+
+// Get all training tasks
+app.get('/api/training-tasks', async (req, res) => {
+  try {
+    const tasks = await readDataFile('training-tasks.json');
+    res.json(tasks || {});
+  } catch (error) {
+    console.error('Error reading training tasks:', error);
+    res.status(500).json({ error: 'Failed to read training tasks' });
+  }
+});
+
+// Update training tasks
+app.post('/api/training-tasks', async (req, res) => {
+  try {
+    const tasks = req.body;
+    await writeDataFile('training-tasks.json', tasks);
+    res.json({ success: true, data: tasks });
+  } catch (error) {
+    console.error('Error saving training tasks:', error);
+    res.status(500).json({ error: 'Failed to save training tasks' });
+  }
+});
+
+// ===== FOOD ENTRIES ENDPOINTS =====
+
+// Get all food entries
+app.get('/api/food-entries', async (req, res) => {
+  try {
+    const entries = await readDataFile('food-entries.json');
+    res.json(entries || []);
+  } catch (error) {
+    console.error('Error reading food entries:', error);
+    res.status(500).json({ error: 'Failed to read food entries' });
+  }
+});
+
+// Add food entry
+app.post('/api/food-entries', async (req, res) => {
+  try {
+    const newEntry = req.body;
+    const entries = await readDataFile('food-entries.json') || [];
+    entries.push(newEntry);
+    await writeDataFile('food-entries.json', entries);
+    res.json({ success: true, data: newEntry });
+  } catch (error) {
+    console.error('Error adding food entry:', error);
+    res.status(500).json({ error: 'Failed to add food entry' });
+  }
+});
+
+// Update food entry
+app.put('/api/food-entries/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updatedEntry = req.body;
+    const entries = await readDataFile('food-entries.json') || [];
+    const index = entries.findIndex(e => e.id === id);
+    
+    if (index === -1) {
+      return res.status(404).json({ error: 'Entry not found' });
+    }
+    
+    entries[index] = updatedEntry;
+    await writeDataFile('food-entries.json', entries);
+    res.json({ success: true, data: updatedEntry });
+  } catch (error) {
+    console.error('Error updating food entry:', error);
+    res.status(500).json({ error: 'Failed to update food entry' });
+  }
+});
+
+// ===== POTTY ENTRIES ENDPOINTS =====
+
+// Get all potty entries
+app.get('/api/potty-entries', async (req, res) => {
+  try {
+    const entries = await readDataFile('potty-entries.json');
+    res.json(entries || []);
+  } catch (error) {
+    console.error('Error reading potty entries:', error);
+    res.status(500).json({ error: 'Failed to read potty entries' });
+  }
+});
+
+// Add potty entry
+app.post('/api/potty-entries', async (req, res) => {
+  try {
+    const newEntry = req.body;
+    const entries = await readDataFile('potty-entries.json') || [];
+    entries.push(newEntry);
+    await writeDataFile('potty-entries.json', entries);
+    res.json({ success: true, data: newEntry });
+  } catch (error) {
+    console.error('Error adding potty entry:', error);
+    res.status(500).json({ error: 'Failed to add potty entry' });
+  }
+});
+
+// ===== PUPPY INFO ENDPOINTS =====
+
+// Get puppy info (birth date, etc.)
+app.get('/api/puppy-info', async (req, res) => {
+  try {
+    const info = await readDataFile('puppy-info.json');
+    res.json(info || {});
+  } catch (error) {
+    console.error('Error reading puppy info:', error);
+    res.status(500).json({ error: 'Failed to read puppy info' });
+  }
+});
+
+// Update puppy info
+app.post('/api/puppy-info', async (req, res) => {
+  try {
+    const info = req.body;
+    await writeDataFile('puppy-info.json', info);
+    res.json({ success: true, data: info });
+  } catch (error) {
+    console.error('Error saving puppy info:', error);
+    res.status(500).json({ error: 'Failed to save puppy info' });
+  }
+});
+
+// ===== SYNC ENDPOINT =====
+
+// Get all data at once for initial sync
+app.get('/api/sync', async (req, res) => {
+  try {
+    const [trainingTasks, foodEntries, pottyEntries, puppyInfo] = await Promise.all([
+      readDataFile('training-tasks.json'),
+      readDataFile('food-entries.json'),
+      readDataFile('potty-entries.json'),
+      readDataFile('puppy-info.json')
+    ]);
+
+    res.json({
+      trainingTasks: trainingTasks || {},
+      foodEntries: foodEntries || [],
+      pottyEntries: pottyEntries || [],
+      puppyInfo: puppyInfo || {}
+    });
+  } catch (error) {
+    console.error('Error syncing data:', error);
+    res.status(500).json({ error: 'Failed to sync data' });
+  }
+});
+
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Start server
+async function startServer() {
+  await initDataDir();
+  app.listen(PORT, () => {
+    console.log(`🚀 Husky Puppy Trainer API server running on port ${PORT}`);
+    console.log(`📁 Data directory: ${DATA_DIR}`);
+  });
+}
+
+startServer().catch(console.error);

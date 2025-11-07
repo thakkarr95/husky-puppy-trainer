@@ -73,3 +73,16 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Server data directory (contains user data)
+server/data/
+
+# Vite build output
+dist/
+dist-ssr/
+*.local

@@ -7,7 +7,11 @@ interface TaskCardProps {
 
 const TaskCard = ({ task, onCompletionChange }: TaskCardProps) => {
   return (
-    <div className={`task-card ${task.completed ? 'completed' : ''}`}>
+    <div 
+      className={`task-card ${task.completed ? 'completed' : ''}`}
+      data-category={task.category}
+      data-difficulty={task.difficulty}
+    >
       <div className="task-header">
         <div className="task-info">
           <span className="category-badge">{task.category}</span>

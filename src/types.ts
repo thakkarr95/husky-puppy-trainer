@@ -10,14 +10,62 @@ export interface TrainingTask {
 export interface FoodEntry {
   id: string;
   date: Date;
+  puppyAgeWeeks: number;
   feedingTimes: {
     time: string;
     completed: boolean;
+    amount?: number; // in cups
+  }[];
+  notes?: string;
+}
+
+export interface PottyEntry {
+  id: string;
+  date: Date;
+  time: string;
+  type: 'pee' | 'poop' | 'both';
+  location: 'outside' | 'inside' | 'accident';
+  notes?: string;
+}
+
+export interface FeedingGuideline {
+  ageWeeks: number;
+  ageRange: string;
+  mealsPerDay: number;
+  cupsPerDay: number;
+  cupsPerMeal: number;
+  weightRange: string;
+  notes: string[];
+}
+
+export interface DailyScheduleItem {
+  id: string;
+  time: string;
+  activity: string;
+  description: string;
+  category: 'Feeding' | 'Potty' | 'Training' | 'Exercise' | 'Sleep' | 'Play';
+  duration?: string;
+  trainingTaskId?: string; // Reference to training task if applicable
+  completed?: boolean;
+}
+
+export interface DailyTodoEntry {
+  id: string;
+  date: Date;
+  items: {
+    scheduleItemId: string;
+    completed: boolean;
+    completedAt?: Date;
+    notes?: string;
   }[];
 }
 
 export interface WeeklyTask {
   week: number;
   title: string;
+  description?: string;
+  focusAreas?: string[];
+  keyMilestones?: string[];
+  tips?: string[];
   tasks: string[]; // Array of task IDs
 }
