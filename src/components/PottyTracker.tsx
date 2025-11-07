@@ -83,7 +83,7 @@ function PottyTracker({ pottyEntries, onAddPottyEntry }: PottyTrackerProps) {
   const getLocationLabel = (location: string) => {
     switch (location) {
       case 'outside': return '✓ Outside';
-      case 'inside': return '✗ Inside/Accident';
+      case 'inside': return '✗ Accident';
       default: return location;
     }
   };
@@ -148,7 +148,7 @@ function PottyTracker({ pottyEntries, onAddPottyEntry }: PottyTrackerProps) {
             {/* Location Selection - Large Touch Targets */}
             <div className="form-group">
               <label>Location</label>
-              <div className="button-group-large">
+              <div className="button-group-large location-group">
                 <button
                   className={`location-btn location-outside ${selectedLocation === 'outside' ? 'active' : ''}`}
                   onClick={() => setSelectedLocation('outside')}
@@ -161,7 +161,7 @@ function PottyTracker({ pottyEntries, onAddPottyEntry }: PottyTrackerProps) {
                   onClick={() => setSelectedLocation('inside')}
                 >
                   <span className="btn-emoji">✗</span>
-                  <span>Inside/Accident</span>
+                  <span>Accident</span>
                 </button>
               </div>
             </div>
