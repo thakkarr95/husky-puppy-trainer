@@ -1,8 +1,50 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# 🐺 Husky Puppy Trainer
 
-# Getting Started
+A mobile application built with React Native to help train and care for your Husky puppy. Track training progress, set reminders, and access training guides all in one place!
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## 🌟 Features
+
+- **Training Modules**: Step-by-step guides for common husky puppy training tasks
+- **Progress Tracking**: Monitor your puppy's learning milestones
+- **Behavior Logs**: Record and track behavioral patterns
+- **Training Reminders**: Set notifications for training sessions
+- **Tips & Resources**: Expert advice specific to Husky breeds
+- **Photo Gallery**: Capture and organize training progress photos
+
+## 🚀 Getting Started
+
+> **Note**: Make sure you have completed the [React Native Environment Setup](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+
+### Prerequisites
+
+- Node.js >= 18
+- npm or Yarn
+- Xcode (for iOS development)
+- Android Studio (for Android development)
+- CocoaPods (for iOS dependencies)
+
+## 📱 Installation
+
+1. Clone the repository:
+```sh
+git clone https://github.com/YOUR_USERNAME/HuskyPuppyTrainer.git
+cd HuskyPuppyTrainer
+```
+
+2. Install dependencies:
+```sh
+npm install
+# OR
+yarn install
+```
+
+3. For iOS, install CocoaPods dependencies:
+```sh
+cd ios
+bundle install
+bundle exec pod install
+cd ..
+```
 
 ## Step 1: Start Metro
 
@@ -86,12 +128,27 @@ You've successfully run and modified your React Native App. :partying_face:
 
 If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
 
+
 # Learn More
 
-To learn more about React Native, take a look at the following resources:
+To learn more about React Native and Husky training:
 
 - [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+- [React Native Docs](https://reactnative.dev/docs/environment-setup) - official documentation.
+- [Husky Training Guide](https://www.akc.org/dog-breeds/siberian-husky/) - AKC Husky resources.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🐕 About Huskies
+
+Siberian Huskies are intelligent, energetic dogs that require consistent training from an early age. This app is designed to help new Husky owners establish good training habits and track their puppy's progress.
+
+---
+
+Built with ❤️ for Husky lovers everywhere!
