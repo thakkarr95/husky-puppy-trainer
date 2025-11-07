@@ -5,9 +5,11 @@ import { puppyDailySchedule } from '../dailyScheduleData';
 interface DailyTodoListProps {
   todoEntries: DailyTodoEntry[];
   onUpdateTodo: (entry: DailyTodoEntry) => void;
+  onQuickLogFood?: () => void;
+  onQuickLogPotty?: (type: 'pee' | 'poop' | 'both') => void;
 }
 
-function DailyTodoList({ todoEntries, onUpdateTodo }: DailyTodoListProps) {
+function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPotty }: DailyTodoListProps) {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [todayEntry, setTodayEntry] = useState<DailyTodoEntry | null>(null);
   const [filterCategory, setFilterCategory] = useState<string>('all');
@@ -225,6 +227,51 @@ function DailyTodoList({ todoEntries, onUpdateTodo }: DailyTodoListProps) {
                     <div className="training-link">
                       <span className="training-icon">🎯</span>
                       <span>Linked to training task</span>
+                    </div>
+                  )}
+                  
+                  {/* Quick Log Buttons for Feeding and Potty */}
+                  {canEdit && item.category === 'Feeding' && onQuickLogFood && (
+                    <button 
+                      className="quick-log-btn food-log"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onQuickLogFood();
+                      }}
+                    >
+                      🍖 Log Feed
+                    </button>
+                  )}
+                  
+                  {canEdit && item.category === 'Potty' && onQuickLogPotty && (
+                    <div className="quick-potty-buttons">
+                      <button 
+                        className="quick-log-btn potty-pee"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onQuickLogPotty('pee');
+                        }}
+                      >
+                        💧 Pee
+                      </button>
+                      <button 
+                        className="quick-log-btn potty-poop"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onQuickLogPotty('poop');
+                        }}
+                      >
+                        💩 Poop
+                      </button>
+                      <button 
+                        className="quick-log-btn potty-both"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onQuickLogPotty('both');
+                        }}
+                      >
+                        💧💩 Both
+                      </button>
                     </div>
                   )}
                 </div>

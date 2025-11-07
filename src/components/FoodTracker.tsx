@@ -50,6 +50,9 @@ const FoodTracker = ({ foodEntries, onAddFoodEntry, onUpdateFeedingTime }: FoodT
       notes: ''
     };
     
+    // Optimistic update - set immediately for instant UX
+    setTodayEntry(newEntry);
+    // Then save to backend
     onAddFoodEntry(newEntry);
   };
 

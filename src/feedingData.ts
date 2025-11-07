@@ -1,17 +1,18 @@
 import type { FeedingGuideline } from './types';
 
-// Feeding guidelines for Husky puppies based on veterinary recommendations
+// Feeding guidelines for Husky puppies using Kirkland Signature Nature's Domain Puppy Formula
+// Based on manufacturer recommendations for large breed puppies
 export const feedingGuidelines: FeedingGuideline[] = [
   {
     ageWeeks: 8,
     ageRange: '8-12 weeks',
     mealsPerDay: 4,
-    cupsPerDay: 1.5,
-    cupsPerMeal: 0.375,
+    cupsPerDay: 2.0,
+    cupsPerMeal: 0.5,
     weightRange: '10-15 lbs',
     notes: [
       'Feed 4 times daily at consistent times',
-      'Use high-quality puppy food formulated for large breeds',
+      'Kirkland Nature\'s Domain Puppy Formula (Chicken & Pea)',
       'Always have fresh water available',
       'Meals should be spaced 3-4 hours apart',
       'Monitor for signs of over/underfeeding'
@@ -21,13 +22,13 @@ export const feedingGuidelines: FeedingGuideline[] = [
     ageWeeks: 12,
     ageRange: '12-16 weeks',
     mealsPerDay: 3,
-    cupsPerDay: 2.0,
-    cupsPerMeal: 0.67,
+    cupsPerDay: 2.75,
+    cupsPerMeal: 0.92,
     weightRange: '15-25 lbs',
     notes: [
       'Reduce to 3 meals per day',
       'Increase portion sizes gradually',
-      'Continue large breed puppy formula',
+      'Continue Kirkland Nature\'s Domain Puppy Formula',
       'Watch for rapid growth spurts',
       'Adjust amounts based on body condition'
     ]
@@ -36,8 +37,8 @@ export const feedingGuidelines: FeedingGuideline[] = [
     ageWeeks: 16,
     ageRange: '16-24 weeks',
     mealsPerDay: 3,
-    cupsPerDay: 2.5,
-    cupsPerMeal: 0.83,
+    cupsPerDay: 3.5,
+    cupsPerMeal: 1.17,
     weightRange: '25-35 lbs',
     notes: [
       'Continue 3 meals daily',
@@ -51,13 +52,13 @@ export const feedingGuidelines: FeedingGuideline[] = [
     ageWeeks: 24,
     ageRange: '24-32 weeks',
     mealsPerDay: 2,
-    cupsPerDay: 3.0,
-    cupsPerMeal: 1.5,
+    cupsPerDay: 4.0,
+    cupsPerMeal: 2.0,
     weightRange: '35-45 lbs',
     notes: [
       'Transition to 2 meals per day',
       'Morning and evening feedings work best',
-      'Continue large breed puppy formula',
+      'Continue Kirkland Nature\'s Domain Puppy Formula',
       'Growth rate starts to slow',
       'Maintain lean body condition'
     ]
@@ -66,8 +67,8 @@ export const feedingGuidelines: FeedingGuideline[] = [
     ageWeeks: 32,
     ageRange: '32-52 weeks',
     mealsPerDay: 2,
-    cupsPerDay: 3.5,
-    cupsPerMeal: 1.75,
+    cupsPerDay: 4.5,
+    cupsPerMeal: 2.25,
     weightRange: '45-55 lbs',
     notes: [
       'Continue 2 meals daily',
@@ -81,8 +82,8 @@ export const feedingGuidelines: FeedingGuideline[] = [
     ageWeeks: 52,
     ageRange: '12+ months (Adult)',
     mealsPerDay: 2,
-    cupsPerDay: 3.0,
-    cupsPerMeal: 1.5,
+    cupsPerDay: 3.5,
+    cupsPerMeal: 1.75,
     weightRange: '50-60 lbs (female), 55-65 lbs (male)',
     notes: [
       'Transition to adult maintenance food',

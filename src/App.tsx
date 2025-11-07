@@ -261,6 +261,47 @@ function App() {
     setIsSavingTodo(false);
   };
 
+  const handleQuickLogFood = () => {
+    // Create a food entry for current time
+    const now = new Date();
+    const currentAge = Math.floor((now.getTime() - new Date('2025-09-13').getTime()) / (1000 * 60 * 60 * 24 * 7));
+    
+    const newEntry: FoodEntry = {
+      id: Date.now().toString(),
+      date: now,
+      puppyAgeWeeks: currentAge,
+      feedingTimes: [{
+        time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+        completed: true,
+        amount: 0.5 // Default amount, user can edit
+      }],
+      notes: 'Logged from daily schedule'
+    };
+    
+    handleAddFoodEntry(newEntry);
+  };
+
+  const handleQuickLogPotty = (type: 'pee' | 'poop' | 'both') => {
+    // Create a potty entry for current time
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-US', { 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      hour12: true 
+    });
+    
+    const newEntry: PottyEntry = {
+      id: Date.now().toString(),
+      date: now,
+      time: timeString,
+      type: type,
+      location: 'outside', // Default to outside
+      notes: 'Logged from daily schedule'
+    };
+    
+    handleAddPottyEntry(newEntry);
+  };
+
   if (isLoading) {
     return (
       <div className="App">
@@ -318,6 +359,8 @@ function App() {
           <DailyTodoList
             todoEntries={todoEntries}
             onUpdateTodo={handleUpdateTodo}
+            onQuickLogFood={handleQuickLogFood}
+            onQuickLogPotty={handleQuickLogPotty}
           />
         )}
         {activeTab === 'schedule' && (
