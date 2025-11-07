@@ -1,33 +1,120 @@
 # 🐺 Husky Puppy Trainer
 
-A mobile application built with React Native to help train and care for your Husky puppy. Track training progress, set reminders, and access training guides all in one place!
+A comprehensive web application to help train and care for your Husky puppy. Track training progress, monitor feeding, log potty breaks, and follow an interactive daily schedule - all synced across your devices!
+
+## � Live Demo
+
+**🚀 Try it now:** https://thakkarr95.github.io/husky-puppy-trainer
 
 ## 🌟 Features
 
-- **Training Modules**: Step-by-step guides for common husky puppy training tasks
-- **Progress Tracking**: Monitor your puppy's learning milestones
-- **Behavior Logs**: Record and track behavioral patterns
-- **Training Reminders**: Set notifications for training sessions
-- **Tips & Resources**: Expert advice specific to Husky breeds
-- **Photo Gallery**: Capture and organize training progress photos
+- **✅ Daily Todo List**: Interactive checklist with progress tracking for your puppy's daily schedule
+- **🍖 Food Tracker**: Age-based feeding guidelines, meal logging, and weekly progress stats
+- **🚽 Potty Tracker**: Mobile-optimized potty logging with success rate tracking
+- **📋 Training Schedule**: 8-week comprehensive training program with 50+ husky-specific tasks
+- **☁️ Multi-Device Sync**: Log on phone, view on computer - all data synchronized in real-time
+- **📱 Mobile Optimized**: Large touch targets, responsive design, works as PWA (Progressive Web App)
+- **� Offline Support**: Works without internet, syncs when reconnected
 
-## 🚀 Getting Started
+## 🚀 Quick Start
 
-> **Note**: Make sure you have completed the [React Native Environment Setup](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+### Use the Live App (Recommended)
+Just visit: **https://thakkarr95.github.io/husky-puppy-trainer**
+
+Add to your phone's home screen for app-like experience!
+
+### Run Locally
 
 ### Prerequisites
 
 - Node.js >= 18
 - npm or Yarn
-- Xcode (for iOS development)
-- Android Studio (for Android development)
-- CocoaPods (for iOS dependencies)
 
 ## 📱 Installation
 
 1. Clone the repository:
 ```sh
-git clone https://github.com/YOUR_USERNAME/HuskyPuppyTrainer.git
+git clone https://github.com/thakkarr95/husky-puppy-trainer.git
+cd husky-puppy-trainer
+```
+
+2. Install dependencies:
+```sh
+npm install
+```
+
+3. Start the development server:
+```sh
+npm run dev:all
+```
+
+This starts both the frontend (port 5173) and backend server (port 3001).
+
+4. Open http://localhost:5173 in your browser
+
+## 🏗️ Architecture
+
+- **Frontend**: React 19 + TypeScript + Vite
+- **Backend**: Express.js REST API
+- **Storage**: File-based JSON storage
+- **Deployment**: 
+  - Frontend: GitHub Pages
+  - Backend: Railway
+  - CDN: Cloudflare (automatic via GitHub Pages)
+
+## 📚 Documentation
+
+- [SETUP.md](SETUP.md) - Complete setup guide
+- [DEPLOYMENT.md](DEPLOYMENT.md) - Deployment instructions
+- [MOBILE_SETUP.md](MOBILE_SETUP.md) - Mobile device setup
+- [ARCHITECTURE.md](ARCHITECTURE.md) - System architecture details
+
+## � Technology Stack
+
+- **React 19** - Modern UI framework
+- **TypeScript** - Type-safe development
+- **Vite** - Fast build tool and dev server
+- **Express.js** - Backend REST API
+- **localStorage** - Offline data persistence
+- **CSS3** - Custom responsive styling
+- **GitHub Actions** - CI/CD (via gh-pages)
+
+## 📖 Training Content
+
+The app includes comprehensive husky-specific training content:
+- 8-week puppy training program
+- 50+ training tasks covering:
+  - Potty training
+  - Crate training
+  - Socialization
+  - Obedience commands
+  - Bite inhibition
+- Age-based feeding guidelines (8 weeks to adult)
+- Daily schedule with 33 time-based activities
+- Training tips for husky-specific behaviors
+
+## 🌍 Deployment Status
+
+- ✅ **Frontend**: https://thakkarr95.github.io/husky-puppy-trainer
+- ✅ **Backend API**: https://husky-puppy-trainer-production.up.railway.app
+- ✅ **Multi-device sync**: Enabled
+- ✅ **Mobile PWA**: Supported
+
+## 🤝 Contributing
+
+This is a personal project for husky puppy training, but suggestions are welcome!
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 🐾 About
+
+Created to help new husky puppy owners navigate the challenging but rewarding first 8 weeks of puppy training. Includes research-backed training methods and husky-specific advice.
+
+---
+
+**Happy Training! 🐺🎓**
 cd HuskyPuppyTrainer
 ```
 
