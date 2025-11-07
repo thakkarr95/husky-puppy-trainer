@@ -20,6 +20,7 @@ function App() {
   const [isOnline, setIsOnline] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
+  const [isSavingTodo, setIsSavingTodo] = useState(false);
 
   // Load all data on mount
   useEffect(() => {
@@ -90,7 +91,12 @@ function App() {
       setTasksByWeek(Object.keys(merged).length > 0 ? merged : weeklyTraining);
       setFoodEntries(data.foodEntries);
       setPottyEntries(data.pottyEntries);
-      setTodoEntries(data.todoEntries);
+      
+      // Only update todoEntries if we're not currently saving one (avoid race condition)
+      if (!isSavingTodo) {
+        setTodoEntries(data.todoEntries);
+      }
+      
       setIsOnline(true);
       setLastSyncTime(new Date());
     } catch (error) {
@@ -235,12 +241,9 @@ function App() {
   };
 
   const handleUpdateTodo = async (entry: DailyTodoEntry) => {
-    const updatedEntries = todoEntries.filter(e => e.id !== entry.id);
-    updatedEntries.push(entry);
-    setTodoEntries(updatedEntries);
-    localStorage.setItem('husky-todo-entries', JSON.stringify(updatedEntries));
+    setIsSavingTodo(true);
     
-    // Save to server
+    // Save to server FIRST to avoid race condition with sync
     if (isOnline) {
       try {
         await api.saveTodoEntry(entry);
@@ -248,6 +251,14 @@ function App() {
         console.error('Error saving todo to server:', error);
       }
     }
+    
+    // Then update local state and localStorage
+    const updatedEntries = todoEntries.filter(e => e.id !== entry.id);
+    updatedEntries.push(entry);
+    setTodoEntries(updatedEntries);
+    localStorage.setItem('husky-todo-entries', JSON.stringify(updatedEntries));
+    
+    setIsSavingTodo(false);
   };
 
   if (isLoading) {
