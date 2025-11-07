@@ -1,4 +1,4 @@
-import type { TrainingTask, FoodEntry, PottyEntry } from './types';
+import type { TrainingTask, FoodEntry, PottyEntry, DailyTodoEntry } from './types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
@@ -75,6 +75,19 @@ export async function addPottyEntry(entry: PottyEntry): Promise<void> {
   });
 }
 
+// ===== TODO ENTRIES API =====
+
+export async function getTodoEntries(): Promise<DailyTodoEntry[]> {
+  return apiCall('/api/todo-entries');
+}
+
+export async function saveTodoEntry(entry: DailyTodoEntry): Promise<void> {
+  await apiCall('/api/todo-entries', {
+    method: 'POST',
+    body: JSON.stringify(entry),
+  });
+}
+
 // ===== PUPPY INFO API =====
 
 export async function getPuppyInfo(): Promise<{ birthDate?: string }> {
@@ -95,6 +108,7 @@ export interface SyncData {
   foodEntries: FoodEntry[];
   pottyEntries: PottyEntry[];
   puppyInfo: { birthDate?: string };
+  todoEntries: DailyTodoEntry[];
 }
 
 export async function syncAllData(): Promise<SyncData> {
@@ -112,6 +126,7 @@ export async function syncAllData(): Promise<SyncData> {
       date: new Date(entry.date),
     })),
     puppyInfo: data.puppyInfo,
+    todoEntries: data.todoEntries || [],
   };
 }
 

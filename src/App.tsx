@@ -90,6 +90,7 @@ function App() {
       setTasksByWeek(Object.keys(merged).length > 0 ? merged : weeklyTraining);
       setFoodEntries(data.foodEntries);
       setPottyEntries(data.pottyEntries);
+      setTodoEntries(data.todoEntries);
       setIsOnline(true);
       setLastSyncTime(new Date());
     } catch (error) {
@@ -233,11 +234,20 @@ function App() {
     localStorage.setItem('husky-potty-entries', JSON.stringify(updatedEntries));
   };
 
-  const handleUpdateTodo = (entry: DailyTodoEntry) => {
+  const handleUpdateTodo = async (entry: DailyTodoEntry) => {
     const updatedEntries = todoEntries.filter(e => e.id !== entry.id);
     updatedEntries.push(entry);
     setTodoEntries(updatedEntries);
     localStorage.setItem('husky-todo-entries', JSON.stringify(updatedEntries));
+    
+    // Save to server
+    if (isOnline) {
+      try {
+        await api.saveTodoEntry(entry);
+      } catch (error) {
+        console.error('Error saving todo to server:', error);
+      }
+    }
   };
 
   if (isLoading) {

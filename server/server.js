@@ -169,23 +169,56 @@ app.post('/api/puppy-info', async (req, res) => {
   }
 });
 
+// ===== TODO ENTRIES ENDPOINTS =====
+
+// Get all todo entries
+app.get('/api/todo-entries', async (req, res) => {
+  try {
+    const entries = await readDataFile('todo-entries.json');
+    res.json(entries || []);
+  } catch (error) {
+    console.error('Error reading todo entries:', error);
+    res.status(500).json({ error: 'Failed to read todo entries' });
+  }
+});
+
+// Add or update todo entry
+app.post('/api/todo-entries', async (req, res) => {
+  try {
+    const newEntry = req.body;
+    const entries = await readDataFile('todo-entries.json') || [];
+    
+    // Remove existing entry for same date if exists
+    const filteredEntries = entries.filter(e => e.id !== newEntry.id);
+    filteredEntries.push(newEntry);
+    
+    await writeDataFile('todo-entries.json', filteredEntries);
+    res.json({ success: true, data: newEntry });
+  } catch (error) {
+    console.error('Error saving todo entry:', error);
+    res.status(500).json({ error: 'Failed to save todo entry' });
+  }
+});
+
 // ===== SYNC ENDPOINT =====
 
 // Get all data at once for initial sync
 app.get('/api/sync', async (req, res) => {
   try {
-    const [trainingTasks, foodEntries, pottyEntries, puppyInfo] = await Promise.all([
+    const [trainingTasks, foodEntries, pottyEntries, puppyInfo, todoEntries] = await Promise.all([
       readDataFile('training-tasks.json'),
       readDataFile('food-entries.json'),
       readDataFile('potty-entries.json'),
-      readDataFile('puppy-info.json')
+      readDataFile('puppy-info.json'),
+      readDataFile('todo-entries.json')
     ]);
 
     res.json({
       trainingTasks: trainingTasks || {},
       foodEntries: foodEntries || [],
       pottyEntries: pottyEntries || [],
-      puppyInfo: puppyInfo || {}
+      puppyInfo: puppyInfo || {},
+      todoEntries: todoEntries || []
     });
   } catch (error) {
     console.error('Error syncing data:', error);

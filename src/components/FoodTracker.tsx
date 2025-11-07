@@ -9,10 +9,9 @@ interface FoodTrackerProps {
 }
 
 const FoodTracker = ({ foodEntries, onAddFoodEntry, onUpdateFeedingTime }: FoodTrackerProps) => {
-  const [puppyBirthDate, setPuppyBirthDate] = useState<Date>(() => {
-    const saved = localStorage.getItem('husky-puppy-birthdate');
-    return saved ? new Date(saved) : new Date();
-  });
+  // Fixed puppy pickup date - 11/8/2025
+  const PUPPY_PICKUP_DATE = new Date('2025-11-08T00:00:00');
+  const [puppyBirthDate] = useState<Date>(PUPPY_PICKUP_DATE);
   const [currentPuppyAge, setCurrentPuppyAge] = useState(8);
   const [todayEntry, setTodayEntry] = useState<FoodEntry | null>(null);
   const [showAllGuidelines, setShowAllGuidelines] = useState(false);
@@ -33,11 +32,6 @@ const FoodTracker = ({ foodEntries, onAddFoodEntry, onUpdateFeedingTime }: FoodT
     
     setTodayEntry(existing || null);
   }, [puppyBirthDate, foodEntries]);
-
-  const handleBirthDateChange = (date: Date) => {
-    setPuppyBirthDate(date);
-    localStorage.setItem('husky-puppy-birthdate', date.toISOString());
-  };
 
   const createTodayEntry = () => {
     const guideline = getGuidelineForAge(currentPuppyAge);
@@ -83,12 +77,14 @@ const FoodTracker = ({ foodEntries, onAddFoodEntry, onUpdateFeedingTime }: FoodT
         <div className="puppy-info-card">
           <h3>🐺 Puppy Information</h3>
           <div className="info-row">
-            <label>Birth Date (or 8-week pickup date):</label>
+            <label>Pickup Date (8 weeks old):</label>
             <input
               type="date"
               value={puppyBirthDate.toISOString().split('T')[0]}
-              onChange={(e) => handleBirthDateChange(new Date(e.target.value))}
+              readOnly
+              disabled
               className="date-input"
+              title="Puppy pickup date: November 8, 2025"
             />
           </div>
           <div className="info-stats">
