@@ -23,7 +23,7 @@ function App() {
   useEffect(() => {
     loadAllData();
     
-    // Check online status periodically
+    // Check online status and sync data periodically
     const checkOnline = async () => {
       try {
         await api.checkHealth();
@@ -34,10 +34,38 @@ function App() {
     };
     
     checkOnline();
-    const interval = setInterval(checkOnline, 30000); // Check every 30 seconds
+    const healthInterval = setInterval(checkOnline, 30000); // Check every 30 seconds
     
-    return () => clearInterval(interval);
-  }, []);
+    // Sync data every 10 seconds to pick up changes from other devices
+    const syncInterval = setInterval(() => {
+      if (isOnline) {
+        loadAllData();
+      }
+    }, 10000); // Sync every 10 seconds
+    
+    // Reload data when window regains focus (switching back to app)
+    const handleFocus = () => {
+      if (isOnline) {
+        loadAllData();
+      }
+    };
+    window.addEventListener('focus', handleFocus);
+    
+    // Reload data when page becomes visible (mobile tab switching)
+    const handleVisibilityChange = () => {
+      if (!document.hidden && isOnline) {
+        loadAllData();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      clearInterval(healthInterval);
+      clearInterval(syncInterval);
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [isOnline]);
 
   const loadAllData = async () => {
     try {
