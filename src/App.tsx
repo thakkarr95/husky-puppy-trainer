@@ -73,7 +73,13 @@ function App() {
   const loadAllData = async () => {
     try {
       setIsSyncing(true);
+      console.log('Loading data from server and localStorage...');
       const data = await api.syncAllData();
+      console.log('Server data loaded:', {
+        foodEntries: data.foodEntries.length,
+        pottyEntries: data.pottyEntries.length,
+        todoEntries: data.todoEntries.length
+      });
       
       // Merge loaded tasks with defaults
       const merged = { ...weeklyTraining };
