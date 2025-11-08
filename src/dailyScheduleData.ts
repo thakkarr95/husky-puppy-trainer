@@ -5,7 +5,7 @@ import type { DailyScheduleItem } from './types';
 export const puppyDailySchedule: DailyScheduleItem[] = [
   {
     id: 'wake-potty',
-    time: '7:00 AM',
+    time: '8:00 AM',
     activity: 'Wake Up & Potty Break',
     description: 'Take puppy outside immediately. Praise when they go potty.',
     category: 'Potty',
@@ -13,7 +13,7 @@ export const puppyDailySchedule: DailyScheduleItem[] = [
   },
   {
     id: 'breakfast',
-    time: '7:15 AM',
+    time: '8:15 AM',
     activity: 'Breakfast (Meal 1)',
     description: 'Feed measured portion. Remove bowl after 15 minutes.',
     category: 'Feeding',
@@ -21,7 +21,7 @@ export const puppyDailySchedule: DailyScheduleItem[] = [
   },
   {
     id: 'post-breakfast-potty',
-    time: '7:30 AM',
+    time: '8:30 AM',
     activity: 'Post-Meal Potty',
     description: 'Take outside within 15 minutes of eating. Establish routine.',
     category: 'Potty',
@@ -29,7 +29,7 @@ export const puppyDailySchedule: DailyScheduleItem[] = [
   },
   {
     id: 'morning-play',
-    time: '7:45 AM',
+    time: '8:45 AM',
     activity: 'Morning Play Session',
     description: 'Interactive play with toys. Build bond and burn energy.',
     category: 'Play',
@@ -37,7 +37,7 @@ export const puppyDailySchedule: DailyScheduleItem[] = [
   },
   {
     id: 'morning-training',
-    time: '8:00 AM',
+    time: '9:00 AM',
     activity: 'Morning Training: Crate & Name',
     description: 'Practice crate training and name recognition. Make it fun!',
     category: 'Training',
@@ -54,7 +54,7 @@ export const puppyDailySchedule: DailyScheduleItem[] = [
   },
   {
     id: 'mid-morning-potty',
-    time: '10:00 AM',
+    time: '11:00 AM',
     activity: 'Potty Break',
     description: 'Take outside immediately after waking up.',
     category: 'Potty',
@@ -62,7 +62,7 @@ export const puppyDailySchedule: DailyScheduleItem[] = [
   },
   {
     id: 'mid-morning-play',
-    time: '10:15 AM',
+    time: '11:15 AM',
     activity: 'Mid-Morning Play',
     description: 'Gentle play, exploration, or cuddle time.',
     category: 'Play',
@@ -70,7 +70,7 @@ export const puppyDailySchedule: DailyScheduleItem[] = [
   },
   {
     id: 'mid-morning-training',
-    time: '10:45 AM',
+    time: '11:45 AM',
     activity: 'Training: Leash & Walking',
     description: 'Practice leash walking indoors. Get used to collar/harness.',
     category: 'Training',
@@ -79,7 +79,7 @@ export const puppyDailySchedule: DailyScheduleItem[] = [
   },
   {
     id: 'pre-lunch-potty',
-    time: '11:00 AM',
+    time: '12:00 PM',
     activity: 'Potty Break',
     description: 'Regular potty schedule prevents accidents.',
     category: 'Potty',
@@ -87,7 +87,7 @@ export const puppyDailySchedule: DailyScheduleItem[] = [
   },
   {
     id: 'late-morning-nap',
-    time: '11:15 AM',
+    time: '12:15 PM',
     activity: 'Nap Time',
     description: 'Back to crate for rest. Puppies sleep 18-20 hours daily!',
     category: 'Sleep',
@@ -95,7 +95,7 @@ export const puppyDailySchedule: DailyScheduleItem[] = [
   },
   {
     id: 'lunch',
-    time: '1:00 PM',
+    time: '2:00 PM',
     activity: 'Lunch & Potty (Meal 2)',
     description: 'Feed second meal, then immediate potty break.',
     category: 'Feeding',
@@ -103,7 +103,7 @@ export const puppyDailySchedule: DailyScheduleItem[] = [
   },
   {
     id: 'midday-exercise',
-    time: '1:30 PM',
+    time: '2:30 PM',
     activity: 'Midday Exercise',
     description: 'Short walk (10-15 min) or play in yard. Avoid overexertion.',
     category: 'Exercise',
@@ -111,7 +111,7 @@ export const puppyDailySchedule: DailyScheduleItem[] = [
   },
   {
     id: 'afternoon-training',
-    time: '2:00 PM',
+    time: '3:00 PM',
     activity: 'Training: Sit & Stay Basics',
     description: 'Practice sit command and basic stay. Use treats and praise.',
     category: 'Training',
@@ -120,7 +120,7 @@ export const puppyDailySchedule: DailyScheduleItem[] = [
   },
   {
     id: 'afternoon-nap',
-    time: '2:30 PM',
+    time: '3:30 PM',
     activity: 'Afternoon Nap',
     description: 'Long rest period. Quiet time for puppy.',
     category: 'Sleep',
@@ -128,7 +128,7 @@ export const puppyDailySchedule: DailyScheduleItem[] = [
   },
   {
     id: 'late-afternoon-potty',
-    time: '5:00 PM',
+    time: '6:00 PM',
     activity: 'Potty Break',
     description: 'Wake up and outside immediately.',
     category: 'Potty',
@@ -136,7 +136,7 @@ export const puppyDailySchedule: DailyScheduleItem[] = [
   },
   {
     id: 'afternoon-snack',
-    time: '5:15 PM',
+    time: '6:15 PM',
     activity: 'Afternoon Snack (Meal 3)',
     description: 'Third meal of the day for young puppies.',
     category: 'Feeding',
@@ -144,7 +144,7 @@ export const puppyDailySchedule: DailyScheduleItem[] = [
   },
   {
     id: 'post-snack-potty',
-    time: '5:30 PM',
+    time: '6:30 PM',
     activity: 'Post-Meal Potty',
     description: 'Consistent routine after every meal.',
     category: 'Potty',
@@ -152,7 +152,7 @@ export const puppyDailySchedule: DailyScheduleItem[] = [
   },
   {
     id: 'active-play',
-    time: '5:45 PM',
+    time: '6:45 PM',
     activity: 'Active Play Time',
     description: 'Fetch, tug-of-war, or interactive play. Most energetic time!',
     category: 'Play',
@@ -160,7 +160,7 @@ export const puppyDailySchedule: DailyScheduleItem[] = [
   },
   {
     id: 'evening-training-1',
-    time: '6:15 PM',
+    time: '7:15 PM',
     activity: 'Training: Recall Practice',
     description: 'Practice "come" command in safe area. Always reward!',
     category: 'Training',
@@ -169,7 +169,7 @@ export const puppyDailySchedule: DailyScheduleItem[] = [
   },
   {
     id: 'quiet-time',
-    time: '6:30 PM',
+    time: '7:30 PM',
     activity: 'Quiet Time / Nap',
     description: 'Wind down before dinner. Calm activities or rest.',
     category: 'Sleep',
@@ -177,7 +177,7 @@ export const puppyDailySchedule: DailyScheduleItem[] = [
   },
   {
     id: 'pre-dinner-potty',
-    time: '7:30 PM',
+    time: '8:30 PM',
     activity: 'Potty Break',
     description: 'Pre-dinner potty break.',
     category: 'Potty',
@@ -185,7 +185,7 @@ export const puppyDailySchedule: DailyScheduleItem[] = [
   },
   {
     id: 'dinner',
-    time: '7:45 PM',
+    time: '8:45 PM',
     activity: 'Dinner (Meal 4)',
     description: 'Final meal of the day. Same routine as other meals.',
     category: 'Feeding',
@@ -193,7 +193,7 @@ export const puppyDailySchedule: DailyScheduleItem[] = [
   },
   {
     id: 'post-dinner-potty',
-    time: '8:00 PM',
+    time: '9:00 PM',
     activity: 'Post-Dinner Potty',
     description: 'Outside after eating.',
     category: 'Potty',
@@ -201,7 +201,7 @@ export const puppyDailySchedule: DailyScheduleItem[] = [
   },
   {
     id: 'family-time',
-    time: '8:15 PM',
+    time: '9:15 PM',
     activity: 'Family Time',
     description: 'Gentle play, cuddles, bonding time with family.',
     category: 'Play',
@@ -209,7 +209,7 @@ export const puppyDailySchedule: DailyScheduleItem[] = [
   },
   {
     id: 'evening-training-2',
-    time: '9:00 PM',
+    time: '10:00 PM',
     activity: 'Training: Review Session',
     description: 'Review commands learned today. Short and positive!',
     category: 'Training',
@@ -218,7 +218,7 @@ export const puppyDailySchedule: DailyScheduleItem[] = [
   },
   {
     id: 'evening-potty',
-    time: '9:15 PM',
+    time: '10:15 PM',
     activity: 'Potty Break',
     description: 'Regular evening potty break.',
     category: 'Potty',
@@ -226,7 +226,7 @@ export const puppyDailySchedule: DailyScheduleItem[] = [
   },
   {
     id: 'wind-down',
-    time: '9:30 PM',
+    time: '10:30 PM',
     activity: 'Wind Down Time',
     description: 'Calm activities, chew toys, settle for evening.',
     category: 'Play',
@@ -234,7 +234,7 @@ export const puppyDailySchedule: DailyScheduleItem[] = [
   },
   {
     id: 'bedtime-potty',
-    time: '10:00 PM',
+    time: '11:00 PM',
     activity: 'Potty Break',
     description: 'Pre-bedtime potty break.',
     category: 'Potty',
@@ -242,7 +242,7 @@ export const puppyDailySchedule: DailyScheduleItem[] = [
   },
   {
     id: 'bedtime-routine',
-    time: '10:15 PM',
+    time: '11:15 PM',
     activity: 'Bedtime Routine',
     description: 'Last chance for water, gentle settling, into crate.',
     category: 'Sleep',
@@ -250,15 +250,15 @@ export const puppyDailySchedule: DailyScheduleItem[] = [
   },
   {
     id: 'lights-out',
-    time: '10:30 PM',
+    time: '11:30 PM',
     activity: 'Lights Out',
     description: 'Crate near bedroom. May need 1-2 night potty breaks initially.',
     category: 'Sleep',
-    duration: 'Until 7 AM'
+    duration: 'Until 8 AM'
   },
   {
     id: 'night-potty-1',
-    time: '12:00 AM',
+    time: '1:00 AM',
     activity: 'Night Potty Break (Optional)',
     description: 'For very young puppies (8-10 weeks). Quick and quiet - no play!',
     category: 'Potty',
@@ -266,7 +266,7 @@ export const puppyDailySchedule: DailyScheduleItem[] = [
   },
   {
     id: 'night-potty-2',
-    time: '3:00 AM',
+    time: '4:00 AM',
     activity: 'Night Potty Break (If Needed)',
     description: 'Only if puppy whines. Keep lights dim, no interaction.',
     category: 'Potty',
