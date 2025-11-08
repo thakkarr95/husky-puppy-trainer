@@ -367,6 +367,22 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
                         >
                           💩 Poop
                         </button>
+                        <button 
+                          className="quick-log-btn potty-both"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onQuickLogPotty(item.id, 'both', pottyLocations[item.id] || 'outside');
+                            // Track that both were logged
+                            setLoggedPottyTypes(prev => {
+                              const itemSet = new Set<'pee' | 'poop'>(['pee', 'poop']);
+                              return { ...prev, [item.id]: itemSet };
+                            });
+                            // Don't show follow-up since both were logged
+                            setShowFollowUpForm(prev => ({ ...prev, [item.id]: false }));
+                          }}
+                        >
+                          💧💩 Both
+                        </button>
                       </div>
                       
                       {/* Follow-up form for logging the other type */}
