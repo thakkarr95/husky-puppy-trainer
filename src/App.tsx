@@ -341,27 +341,35 @@ function App() {
 
   const handleQuickLogPotty = (scheduleItemId: string, type: 'pee' | 'poop' | 'both', location: 'outside' | 'inside', customTime?: string) => {
     console.log('Quick log potty clicked for item:', scheduleItemId);
-    // Create a potty entry for current time or custom time
-    const now = new Date();
-    const timeString = customTime || now.toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
-      minute: '2-digit', 
-      hour12: true 
+    
+    // Find the schedule item to get context
+    import('./dailyScheduleData').then(({ puppyDailySchedule }) => {
+      const scheduleItem = puppyDailySchedule.find(item => item.id === scheduleItemId);
+      const context = scheduleItem ? scheduleItem.activity : undefined;
+      
+      // Create a potty entry for current time or custom time
+      const now = new Date();
+      const timeString = customTime || now.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        hour12: true 
+      });
+      
+      const entryWithoutId = {
+        date: now,
+        time: timeString,
+        type: type,
+        location: location,
+        context: context,
+        notes: customTime ? 'Logged later from daily schedule' : 'Logged from daily schedule'
+      };
+      
+      // Use the existing handler which already does optimistic update
+      handleAddPottyEntry(entryWithoutId);
+      
+      // Mark this specific todo item as completed
+      markTodosCompleted(scheduleItemId);
     });
-    
-    const entryWithoutId = {
-      date: now,
-      time: timeString,
-      type: type,
-      location: location,
-      notes: customTime ? 'Logged later from daily schedule' : 'Logged from daily schedule'
-    };
-    
-    // Use the existing handler which already does optimistic update
-    handleAddPottyEntry(entryWithoutId);
-    
-    // Mark this specific todo item as completed
-    markTodosCompleted(scheduleItemId);
   };
 
   if (isLoading) {

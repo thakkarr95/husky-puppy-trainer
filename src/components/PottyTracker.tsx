@@ -92,6 +92,46 @@ function PottyTracker({ pottyEntries, onAddPottyEntry }: PottyTrackerProps) {
     <div className="potty-tracker-container">
       <div className="tracker-content">
         
+        {/* Weekly Progress Card */}
+        <div className="weekly-progress-card">
+          <h3>📈 This Week's Progress</h3>
+          <div className="progress-bar-container">
+            <div className="progress-bar-large">
+              <div 
+                className="progress-fill-large success"
+                style={{ width: `${weekStats.successRate}%` }}
+              />
+            </div>
+            <span className="progress-label">
+              {weekStats.outside} outside, {weekStats.accidents} accidents ({weekStats.successRate}% success)
+            </span>
+          </div>
+          {weekStats.successRate >= 80 && (
+            <div className="success-message">
+              ✅ Excellent! Your pup is doing great with potty training!
+            </div>
+          )}
+          {weekStats.successRate < 60 && weekEntries.length > 5 && (
+            <div className="warning-message">
+              💪 Keep working on it! Consistency is key for potty training.
+            </div>
+          )}
+          <div className="weekly-stats-grid">
+            <div className="stat-card">
+              <div className="stat-value-large">{weekEntries.length}</div>
+              <div className="stat-label-small">Total Breaks</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-value-large">{weekStats.outside}</div>
+              <div className="stat-label-small">Outside</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-value-large">{weekStats.accidents}</div>
+              <div className="stat-label-small">Accidents</div>
+            </div>
+          </div>
+        </div>
+        
         {/* Weekly Stats - Compact */}
         <div className="potty-stats-compact">
           <div className="stat-item success">
@@ -207,6 +247,9 @@ function PottyTracker({ pottyEntries, onAddPottyEntry }: PottyTrackerProps) {
                       {getLocationLabel(entry.location)}
                     </span>
                   </div>
+                  {entry.context && (
+                    <div className="entry-context">📍 {entry.context}</div>
+                  )}
                   {entry.notes && (
                     <div className="entry-notes">{entry.notes}</div>
                   )}
