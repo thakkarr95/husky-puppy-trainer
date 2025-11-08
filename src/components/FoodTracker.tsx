@@ -89,32 +89,46 @@ const FoodTracker = ({ foodEntries, onAddFoodEntry, onUpdateFeedingTime }: FoodT
     const totalPerMeal = currentGuideline.cupsPerMeal;
     
     if (transitionDay <= 2) {
-      // Days 1-2: 75% old, 25% new
+      // Days 1-2: 90% old, 10% new (Gentle start)
       return {
-        oldKibble: (totalPerMeal * 0.75).toFixed(2),
-        newKibble: (totalPerMeal * 0.25).toFixed(2),
+        oldKibble: (totalPerMeal * 0.90).toFixed(2),
+        newKibble: (totalPerMeal * 0.10).toFixed(2),
         phase: 'Days 1-2'
       };
     } else if (transitionDay <= 4) {
-      // Days 3-4: 50% old, 50% new
+      // Days 3-4: 75% old, 25% new
+      return {
+        oldKibble: (totalPerMeal * 0.75).toFixed(2),
+        newKibble: (totalPerMeal * 0.25).toFixed(2),
+        phase: 'Days 3-4'
+      };
+    } else if (transitionDay <= 6) {
+      // Days 5-6: 50% old, 50% new
       return {
         oldKibble: (totalPerMeal * 0.50).toFixed(2),
         newKibble: (totalPerMeal * 0.50).toFixed(2),
-        phase: 'Days 3-4'
+        phase: 'Days 5-6'
       };
-    } else if (transitionDay <= 7) {
-      // Days 5-7: 25% old, 75% new
+    } else if (transitionDay <= 8) {
+      // Days 7-8: 25% old, 75% new
       return {
         oldKibble: (totalPerMeal * 0.25).toFixed(2),
         newKibble: (totalPerMeal * 0.75).toFixed(2),
-        phase: 'Days 5-7'
+        phase: 'Days 7-8'
+      };
+    } else if (transitionDay <= 10) {
+      // Days 9-10: 10% old, 90% new (Final adjustment)
+      return {
+        oldKibble: (totalPerMeal * 0.10).toFixed(2),
+        newKibble: (totalPerMeal * 0.90).toFixed(2),
+        phase: 'Days 9-10'
       };
     } else {
-      // Day 8+: 100% new
+      // Day 11+: 100% new
       return {
         oldKibble: '0.00',
         newKibble: totalPerMeal.toFixed(2),
-        phase: 'Day 8+ (Complete)'
+        phase: 'Day 11+ (Complete)'
       };
     }
   };
