@@ -298,8 +298,8 @@ function App() {
     handleUpdateTodo(updatedEntry);
   };
 
-  const handleQuickLogFood = (scheduleItemId: string) => {
-    console.log('Quick log food clicked for item:', scheduleItemId);
+  const handleQuickLogFood = (scheduleItemId: string, amount?: number, isTreat?: boolean) => {
+    console.log('Quick log food clicked for item:', scheduleItemId, 'amount:', amount, 'isTreat:', isTreat);
     // Create a food entry for current time
     const now = new Date();
     const currentAge = Math.floor((now.getTime() - new Date('2025-09-13').getTime()) / (1000 * 60 * 60 * 24 * 7));
@@ -311,20 +311,26 @@ function App() {
       feedingTimes: [{
         time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
         completed: true,
-        amount: 0.5 // Default amount, user can edit
+        amount: amount || 0.5
       }],
-      notes: 'Logged from daily schedule'
+      notes: isTreat ? 'Training treats' : 'Logged from daily schedule'
     };
     
     console.log('Creating food entry:', newEntry);
     // Use the existing handler which already does optimistic update
     handleAddFoodEntry(newEntry);
     
-    // Mark this specific todo item as completed
-    markTodosCompleted(scheduleItemId);
+    // Mark this specific todo item as completed (but not for treats)
+    if (!isTreat) {
+      markTodosCompleted(scheduleItemId);
+    }
     
     // Show feedback
-    alert('Feed logged! ✓\nSwitch to Food tab to see details.');
+    if (isTreat) {
+      alert('Treats logged! 🦴\nSwitch to Food tab to see details.');
+    } else {
+      alert('Feed logged! ✓\nSwitch to Food tab to see details.');
+    }
   };
 
   const handleQuickLogPotty = (scheduleItemId: string, type: 'pee' | 'poop' | 'both', location: 'outside' | 'inside') => {

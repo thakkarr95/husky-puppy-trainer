@@ -5,7 +5,7 @@ import { puppyDailySchedule } from '../dailyScheduleData';
 interface DailyTodoListProps {
   todoEntries: DailyTodoEntry[];
   onUpdateTodo: (entry: DailyTodoEntry) => void;
-  onQuickLogFood?: (scheduleItemId: string) => void;
+  onQuickLogFood?: (scheduleItemId: string, amount?: number, isTreat?: boolean) => void;
   onQuickLogPotty?: (scheduleItemId: string, type: 'pee' | 'poop' | 'both', location: 'outside' | 'inside') => void;
 }
 
@@ -14,6 +14,8 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
   const [todayEntry, setTodayEntry] = useState<DailyTodoEntry | null>(null);
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [pottyLocations, setPottyLocations] = useState<Record<string, 'outside' | 'inside'>>({});
+  const [feedingAmounts, setFeedingAmounts] = useState<Record<string, number>>({});
+  const [showTreatLog, setShowTreatLog] = useState(false);
 
   useEffect(() => {
     // Find or create entry for selected date
@@ -156,6 +158,43 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
         </div>
       )}
 
+      {/* Quick Treat Log */}
+      {isToday() && onQuickLogFood && (
+        <div className="quick-treat-section">
+          <button 
+            className="treat-toggle-btn"
+            onClick={() => setShowTreatLog(!showTreatLog)}
+          >
+            🦴 {showTreatLog ? 'Hide' : 'Log Training Treats'}
+          </button>
+          {showTreatLog && (
+            <div className="treat-log-form">
+              <label>Treat Amount (pieces/cups):</label>
+              <input 
+                type="number"
+                step="0.1"
+                min="0"
+                max="2"
+                value={feedingAmounts['treats'] || 0.1}
+                onChange={(e) => {
+                  setFeedingAmounts(prev => ({ ...prev, treats: parseFloat(e.target.value) || 0.1 }));
+                }}
+                className="amount-input"
+              />
+              <button 
+                className="quick-log-btn treat-log"
+                onClick={() => {
+                  onQuickLogFood('training-treats', feedingAmounts['treats'] || 0.1, true);
+                  setShowTreatLog(false);
+                }}
+              >
+                🦴 Log Treats
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Category Filter */}
       <div className="category-filter">
         <button 
@@ -233,15 +272,33 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
                   
                   {/* Quick Log Buttons for Feeding and Potty */}
                   {canEdit && item.category === 'Feeding' && onQuickLogFood && (
-                    <button 
-                      className="quick-log-btn food-log"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onQuickLogFood(item.id);
-                      }}
-                    >
-                      🍖 Log Feed
-                    </button>
+                    <div className="quick-feed-section">
+                      <div className="feed-amount-input">
+                        <label>Amount (cups):</label>
+                        <input 
+                          type="number"
+                          step="0.25"
+                          min="0"
+                          max="5"
+                          value={feedingAmounts[item.id] || 0.5}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            setFeedingAmounts(prev => ({ ...prev, [item.id]: parseFloat(e.target.value) || 0.5 }));
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                          className="amount-input"
+                        />
+                      </div>
+                      <button 
+                        className="quick-log-btn food-log"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onQuickLogFood(item.id, feedingAmounts[item.id] || 0.5, false);
+                        }}
+                      >
+                        🍖 Log Feed
+                      </button>
+                    </div>
                   )}
                   
                   {canEdit && item.category === 'Potty' && onQuickLogPotty && (
