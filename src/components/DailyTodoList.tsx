@@ -6,7 +6,7 @@ interface DailyTodoListProps {
   todoEntries: DailyTodoEntry[];
   onUpdateTodo: (entry: DailyTodoEntry) => void;
   onQuickLogFood?: (scheduleItemId: string, amount?: number, isTreat?: boolean) => void;
-  onQuickLogPotty?: (scheduleItemId: string, type: 'pee' | 'poop' | 'both', location: 'outside' | 'inside') => void;
+  onQuickLogPotty?: (scheduleItemId: string, type: 'pee' | 'poop' | 'both', location: 'outside' | 'inside', customTime?: string) => void;
 }
 
 function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPotty }: DailyTodoListProps) {
@@ -16,6 +16,9 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
   const [pottyLocations, setPottyLocations] = useState<Record<string, 'outside' | 'inside'>>({});
   const [feedingAmounts, setFeedingAmounts] = useState<Record<string, number>>({});
   const [showTreatLog, setShowTreatLog] = useState(false);
+  const [loggedPottyTypes, setLoggedPottyTypes] = useState<Record<string, Set<'pee' | 'poop'>>>({});
+  const [showFollowUpForm, setShowFollowUpForm] = useState<Record<string, boolean>>({});
+  const [followUpTimes, setFollowUpTimes] = useState<Record<string, string>>({});
 
   useEffect(() => {
     // Find or create entry for selected date
@@ -329,6 +332,17 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
                           onClick={(e) => {
                             e.stopPropagation();
                             onQuickLogPotty(item.id, 'pee', pottyLocations[item.id] || 'outside');
+                            // Track what was logged
+                            setLoggedPottyTypes(prev => {
+                              const itemSet = prev[item.id] || new Set<'pee' | 'poop'>();
+                              itemSet.add('pee');
+                              return { ...prev, [item.id]: itemSet };
+                            });
+                            // Show follow-up if only one type logged
+                            const currentTypes = loggedPottyTypes[item.id] || new Set();
+                            if (currentTypes.size === 0 || (currentTypes.size === 1 && !currentTypes.has('pee'))) {
+                              setShowFollowUpForm(prev => ({ ...prev, [item.id]: true }));
+                            }
                           }}
                         >
                           💧 Pee
@@ -338,20 +352,84 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
                           onClick={(e) => {
                             e.stopPropagation();
                             onQuickLogPotty(item.id, 'poop', pottyLocations[item.id] || 'outside');
+                            // Track what was logged
+                            setLoggedPottyTypes(prev => {
+                              const itemSet = prev[item.id] || new Set<'pee' | 'poop'>();
+                              itemSet.add('poop');
+                              return { ...prev, [item.id]: itemSet };
+                            });
+                            // Show follow-up if only one type logged
+                            const currentTypes = loggedPottyTypes[item.id] || new Set();
+                            if (currentTypes.size === 0 || (currentTypes.size === 1 && !currentTypes.has('poop'))) {
+                              setShowFollowUpForm(prev => ({ ...prev, [item.id]: true }));
+                            }
                           }}
                         >
                           💩 Poop
                         </button>
-                        <button 
-                          className="quick-log-btn potty-both"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onQuickLogPotty(item.id, 'both', pottyLocations[item.id] || 'outside');
-                          }}
-                        >
-                          💧💩 Both
-                        </button>
                       </div>
+                      
+                      {/* Follow-up form for logging the other type */}
+                      {showFollowUpForm[item.id] && (
+                        <div className="potty-followup-form">
+                          <div className="followup-header">
+                            <span>
+                              {loggedPottyTypes[item.id]?.has('pee') && !loggedPottyTypes[item.id]?.has('poop') 
+                                ? '💩 Did pup poop later?' 
+                                : '💧 Did pup pee later?'}
+                            </span>
+                            <button 
+                              className="close-followup"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setShowFollowUpForm(prev => ({ ...prev, [item.id]: false }));
+                              }}
+                            >
+                              ✕
+                            </button>
+                          </div>
+                          <div className="followup-time-input">
+                            <label>Time:</label>
+                            <input 
+                              type="time"
+                              value={followUpTimes[item.id] || ''}
+                              onChange={(e) => {
+                                e.stopPropagation();
+                                setFollowUpTimes(prev => ({ ...prev, [item.id]: e.target.value }));
+                              }}
+                              onClick={(e) => e.stopPropagation()}
+                              className="time-input"
+                            />
+                          </div>
+                          <button 
+                            className="quick-log-btn followup-log"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const missingType = loggedPottyTypes[item.id]?.has('pee') ? 'poop' : 'pee';
+                              // Log with custom time if provided
+                              if (followUpTimes[item.id]) {
+                                // Convert time string to proper format
+                                const [hours, minutes] = followUpTimes[item.id].split(':');
+                                const hour12 = parseInt(hours) % 12 || 12;
+                                const ampm = parseInt(hours) >= 12 ? 'PM' : 'AM';
+                                const timeString = `${String(hour12).padStart(2, '0')}:${minutes} ${ampm}`;
+                                onQuickLogPotty(item.id, missingType, pottyLocations[item.id] || 'outside', timeString);
+                              } else {
+                                onQuickLogPotty(item.id, missingType, pottyLocations[item.id] || 'outside');
+                              }
+                              setLoggedPottyTypes(prev => {
+                                const itemSet = prev[item.id] || new Set<'pee' | 'poop'>();
+                                itemSet.add(missingType);
+                                return { ...prev, [item.id]: itemSet };
+                              });
+                              setShowFollowUpForm(prev => ({ ...prev, [item.id]: false }));
+                            }}
+                            disabled={!followUpTimes[item.id]}
+                          >
+                            Log {loggedPottyTypes[item.id]?.has('pee') ? ' Poop' : '💧 Pee'}
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

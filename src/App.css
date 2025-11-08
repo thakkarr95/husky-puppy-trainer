@@ -3555,6 +3555,75 @@
   margin-top: 0.5rem;
 }
 
+/* Potty Follow-up Form */
+.potty-followup-form {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: #f0f9ff;
+  border: 2px solid #3b82f6;
+  border-radius: 8px;
+}
+
+.followup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #1e40af;
+}
+
+.close-followup {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #64748b;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-followup:hover {
+  color: #ef4444;
+}
+
+.followup-time-input {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.followup-time-input label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1e40af;
+}
+
+.time-input {
+  flex: 1;
+  padding: 0.4rem 0.6rem;
+  border: 2px solid #3b82f6;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.followup-log {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  width: 100%;
+}
+
+.followup-log:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .training-icon {
   font-size: 1rem;
 }
