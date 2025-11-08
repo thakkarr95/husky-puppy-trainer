@@ -3591,6 +3591,16 @@
   color: #ef4444;
 }
 
+.followup-location-selector {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.followup-location-selector .location-toggle {
+  flex: 1;
+}
+
 .followup-time-input {
   display: flex;
   align-items: center;

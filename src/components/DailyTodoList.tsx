@@ -19,6 +19,7 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
   const [loggedPottyTypes, setLoggedPottyTypes] = useState<Record<string, Set<'pee' | 'poop'>>>({});
   const [showFollowUpForm, setShowFollowUpForm] = useState<Record<string, boolean>>({});
   const [followUpTimes, setFollowUpTimes] = useState<Record<string, string>>({});
+  const [followUpLocations, setFollowUpLocations] = useState<Record<string, 'outside' | 'inside'>>({});
 
   useEffect(() => {
     // Find or create entry for selected date
@@ -404,6 +405,29 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
                               ✕
                             </button>
                           </div>
+                          
+                          {/* Location selector for follow-up */}
+                          <div className="followup-location-selector">
+                            <button 
+                              className={`location-toggle ${(followUpLocations[item.id] || 'outside') === 'outside' ? 'active' : ''}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setFollowUpLocations(prev => ({ ...prev, [item.id]: 'outside' }));
+                              }}
+                            >
+                              ✓ Outside
+                            </button>
+                            <button 
+                              className={`location-toggle ${(followUpLocations[item.id] || 'outside') === 'inside' ? 'active' : ''}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setFollowUpLocations(prev => ({ ...prev, [item.id]: 'inside' }));
+                              }}
+                            >
+                              ✗ Accident
+                            </button>
+                          </div>
+                          
                           <div className="followup-time-input">
                             <label>Time:</label>
                             <input 
@@ -422,6 +446,7 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
                             onClick={(e) => {
                               e.stopPropagation();
                               const missingType = loggedPottyTypes[item.id]?.has('pee') ? 'poop' : 'pee';
+                              const followUpLocation = followUpLocations[item.id] || 'outside';
                               // Log with custom time if provided
                               if (followUpTimes[item.id]) {
                                 // Convert time string to proper format
@@ -429,9 +454,9 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
                                 const hour12 = parseInt(hours) % 12 || 12;
                                 const ampm = parseInt(hours) >= 12 ? 'PM' : 'AM';
                                 const timeString = `${String(hour12).padStart(2, '0')}:${minutes} ${ampm}`;
-                                onQuickLogPotty(item.id, missingType, pottyLocations[item.id] || 'outside', timeString);
+                                onQuickLogPotty(item.id, missingType, followUpLocation, timeString);
                               } else {
-                                onQuickLogPotty(item.id, missingType, pottyLocations[item.id] || 'outside');
+                                onQuickLogPotty(item.id, missingType, followUpLocation);
                               }
                               setLoggedPottyTypes(prev => {
                                 const itemSet = prev[item.id] || new Set<'pee' | 'poop'>();
@@ -442,7 +467,7 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
                             }}
                             disabled={!followUpTimes[item.id]}
                           >
-                            Log {loggedPottyTypes[item.id]?.has('pee') ? ' Poop' : '💧 Pee'}
+                            Log {loggedPottyTypes[item.id]?.has('pee') ? '💩 Poop' : '💧 Pee'}
                           </button>
                         </div>
                       )}
