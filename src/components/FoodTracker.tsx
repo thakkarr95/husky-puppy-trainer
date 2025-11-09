@@ -16,6 +16,9 @@ const FoodTracker = ({ foodEntries, onAddFoodEntry, onUpdateFeedingTime }: FoodT
   const [currentPuppyAge, setCurrentPuppyAge] = useState(8);
   const [todayEntry, setTodayEntry] = useState<FoodEntry | null>(null);
   const [showAllGuidelines, setShowAllGuidelines] = useState(false);
+  const [customTime, setCustomTime] = useState('');
+  const [useCustomTime, setUseCustomTime] = useState(false);
+  const [feedAmount, setFeedAmount] = useState(0.5);
 
   useEffect(() => {
     const age = calculatePuppyAge(puppyBirthDate);
@@ -135,6 +138,44 @@ const FoodTracker = ({ foodEntries, onAddFoodEntry, onUpdateFeedingTime }: FoodT
 
   const kibbleAmounts = getKibbleAmounts();
   const transitionDay = getTransitionDay();
+
+  const handleQuickLogFood = () => {
+    const now = new Date();
+    let timeString: string;
+
+    if (useCustomTime && customTime) {
+      // Convert custom time to 12-hour format
+      const [hours, minutes] = customTime.split(':');
+      const hour12 = parseInt(hours) % 12 || 12;
+      const ampm = parseInt(hours) >= 12 ? 'PM' : 'AM';
+      timeString = `${String(hour12).padStart(2, '0')}:${minutes} ${ampm}`;
+    } else {
+      timeString = now.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: true 
+      });
+    }
+
+    const newEntry: FoodEntry = {
+      id: Date.now().toString(),
+      date: now,
+      puppyAgeWeeks: currentPuppyAge,
+      feedingTimes: [{
+        time: timeString,
+        completed: true,
+        amount: feedAmount
+      }],
+      notes: useCustomTime ? 'Logged at specific time' : 'Quick logged'
+    };
+
+    onAddFoodEntry(newEntry);
+    
+    // Reset form
+    setCustomTime('');
+    setUseCustomTime(false);
+    setFeedAmount(0.5);
+  };
 
   return (
     <div className="food-tracker-container">
@@ -298,6 +339,62 @@ const FoodTracker = ({ foodEntries, onAddFoodEntry, onUpdateFeedingTime }: FoodT
                 ⚠️ Try to maintain a consistent feeding schedule for best results
               </div>
             )}
+          </div>
+
+          {/* Quick Log Section */}
+          <div className="quick-log-section">
+            <h3>🍖 Quick Log Feeding</h3>
+            
+            <div className="quick-log-form">
+              {/* Amount Input */}
+              <div className="form-group">
+                <label>Amount (cups)</label>
+                <input
+                  type="number"
+                  step="0.25"
+                  min="0"
+                  max="5"
+                  value={feedAmount}
+                  onChange={(e) => setFeedAmount(parseFloat(e.target.value) || 0.5)}
+                  className="amount-input-large"
+                />
+              </div>
+
+              {/* Custom Time Toggle */}
+              <div className="form-group">
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={useCustomTime}
+                    onChange={(e) => setUseCustomTime(e.target.checked)}
+                  />
+                  <span>Log at specific time</span>
+                </label>
+              </div>
+
+              {/* Custom Time Input */}
+              {useCustomTime && (
+                <div className="form-group">
+                  <label>Time</label>
+                  <input
+                    type="time"
+                    className="time-input-mobile"
+                    value={customTime}
+                    onChange={(e) => setCustomTime(e.target.value)}
+                  />
+                </div>
+              )}
+
+              {/* Submit Button */}
+              <button 
+                className="log-button-large" 
+                onClick={handleQuickLogFood}
+                disabled={useCustomTime && !customTime}
+              >
+                <span className="log-icon">📝</span>
+                <span>Log Feeding</span>
+              </button>
+            </div>
           </div>
 
           <div className="today-tracker">
