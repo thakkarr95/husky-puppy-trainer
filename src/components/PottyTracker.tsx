@@ -10,6 +10,8 @@ function PottyTracker({ pottyEntries, onAddPottyEntry }: PottyTrackerProps) {
   const [selectedType, setSelectedType] = useState<'pee' | 'poop' | 'both'>('pee');
   const [selectedLocation, setSelectedLocation] = useState<'outside' | 'inside'>('outside');
   const [notes, setNotes] = useState('');
+  const [customTime, setCustomTime] = useState('');
+  const [useCustomTime, setUseCustomTime] = useState(false);
 
   // Get today's entries
   const today = new Date();
@@ -46,11 +48,21 @@ function PottyTracker({ pottyEntries, onAddPottyEntry }: PottyTrackerProps) {
 
   const handleQuickLog = () => {
     const now = new Date();
-    const timeString = now.toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
-      minute: '2-digit',
-      hour12: true 
-    });
+    let timeString: string;
+
+    if (useCustomTime && customTime) {
+      // Convert custom time to 12-hour format
+      const [hours, minutes] = customTime.split(':');
+      const hour12 = parseInt(hours) % 12 || 12;
+      const ampm = parseInt(hours) >= 12 ? 'PM' : 'AM';
+      timeString = `${String(hour12).padStart(2, '0')}:${minutes} ${ampm}`;
+    } else {
+      timeString = now.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: true 
+      });
+    }
 
     onAddPottyEntry({
       date: now,
@@ -60,8 +72,10 @@ function PottyTracker({ pottyEntries, onAddPottyEntry }: PottyTrackerProps) {
       notes: notes.trim() || undefined
     });
 
-    // Reset notes after logging
+    // Reset form after logging
     setNotes('');
+    setCustomTime('');
+    setUseCustomTime(false);
   };
 
   const getTypeEmoji = (type: 'pee' | 'poop' | 'both') => {
@@ -218,8 +232,37 @@ function PottyTracker({ pottyEntries, onAddPottyEntry }: PottyTrackerProps) {
               />
             </div>
 
+            {/* Custom Time Toggle */}
+            <div className="form-group">
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={useCustomTime}
+                  onChange={(e) => setUseCustomTime(e.target.checked)}
+                />
+                <span>Log at specific time</span>
+              </label>
+            </div>
+
+            {/* Custom Time Input */}
+            {useCustomTime && (
+              <div className="form-group">
+                <label>Time</label>
+                <input
+                  type="time"
+                  className="time-input-mobile"
+                  value={customTime}
+                  onChange={(e) => setCustomTime(e.target.value)}
+                />
+              </div>
+            )}
+
             {/* Large Submit Button */}
-            <button className="log-button-large" onClick={handleQuickLog}>
+            <button 
+              className="log-button-large" 
+              onClick={handleQuickLog}
+              disabled={useCustomTime && !customTime}
+            >
               <span className="log-icon">📝</span>
               <span>Log Potty Break</span>
             </button>
