@@ -5,59 +5,32 @@ import { feedingGuidelines, getGuidelineForAge, calculatePuppyAge } from '../fee
 interface FoodTrackerProps {
   foodEntries: FoodEntry[];
   onAddFoodEntry: (entry: FoodEntry) => void;
-  onUpdateFeedingTime: (entryId: string, timeIndex: number, completed: boolean) => void;
 }
 
-const FoodTracker = ({ foodEntries, onAddFoodEntry, onUpdateFeedingTime }: FoodTrackerProps) => {
+const FoodTracker = ({ foodEntries, onAddFoodEntry }: FoodTrackerProps) => {
   // Fixed puppy birth date - 09/13/2025 (pickup date is 11/8/2025 at 8 weeks old)
   const PUPPY_BIRTH_DATE = new Date('2025-09-13T00:00:00');
   const PUPPY_PICKUP_DATE = new Date('2025-11-08T00:00:00');
   const [puppyBirthDate] = useState<Date>(PUPPY_BIRTH_DATE);
   const [currentPuppyAge, setCurrentPuppyAge] = useState(8);
-  const [todayEntry, setTodayEntry] = useState<FoodEntry | null>(null);
   const [showAllGuidelines, setShowAllGuidelines] = useState(false);
   const [customTime, setCustomTime] = useState('');
   const [useCustomTime, setUseCustomTime] = useState(false);
   const [feedAmount, setFeedAmount] = useState(0.25);
 
+  // Get today's entries
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const todayEntries = foodEntries.filter(entry => {
+    const entryDate = new Date(entry.date);
+    entryDate.setHours(0, 0, 0, 0);
+    return entryDate.getTime() === today.getTime();
+  });
+
   useEffect(() => {
     const age = calculatePuppyAge(puppyBirthDate);
     setCurrentPuppyAge(age);
-    
-    // Find or create today's entry
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    const existing = foodEntries.find(entry => {
-      const entryDate = new Date(entry.date);
-      entryDate.setHours(0, 0, 0, 0);
-      return entryDate.getTime() === today.getTime();
-    });
-    
-    setTodayEntry(existing || null);
   }, [puppyBirthDate, foodEntries]);
-
-  const createTodayEntry = () => {
-    const guideline = getGuidelineForAge(currentPuppyAge);
-    const mealTimes = ['Morning', 'Midday', 'Afternoon', 'Evening'].slice(0, guideline.mealsPerDay);
-    
-    const newEntry: FoodEntry = {
-      id: Date.now().toString(),
-      date: new Date(),
-      puppyAgeWeeks: currentPuppyAge,
-      feedingTimes: mealTimes.map(time => ({
-        time,
-        completed: false,
-        amount: guideline.cupsPerMeal
-      })),
-      notes: ''
-    };
-    
-    // Optimistic update - set immediately for instant UX
-    setTodayEntry(newEntry);
-    // Then save to backend
-    onAddFoodEntry(newEntry);
-  };
 
   const currentGuideline = getGuidelineForAge(currentPuppyAge);
   
@@ -397,31 +370,28 @@ const FoodTracker = ({ foodEntries, onAddFoodEntry, onUpdateFeedingTime }: FoodT
             </div>
           </div>
 
-          <div className="today-tracker">
-            <h3>🍽️ Today's Feeding</h3>
-            {!todayEntry ? (
-              <div className="no-entry">
-                <p>No entry for today yet.</p>
-                <button className="create-entry-btn" onClick={createTodayEntry}>
-                  Create Today's Entry
-                </button>
+          <div className="today-entries-section">
+            <h3>📅 Today's Log ({todayEntries.reduce((count, entry) => count + entry.feedingTimes.length, 0)})</h3>
+            {todayEntries.length === 0 ? (
+              <div className="no-entries">
+                <p>No feedings logged yet today</p>
               </div>
             ) : (
-              <div className="feeding-checklist-mobile">
-                {todayEntry.feedingTimes.map((ft, index) => (
-                  <div key={index} className={`meal-item-mobile ${ft.completed ? 'meal-completed' : ''}`}>
-                    <input
-                      type="checkbox"
-                      className="meal-checkbox-large"
-                      checked={ft.completed}
-                      onChange={(e) => onUpdateFeedingTime(todayEntry.id, index, e.target.checked)}
-                    />
-                    <div className="meal-info">
-                      <div className="meal-time">{ft.time}</div>
-                      <div className="meal-amount">{ft.amount?.toFixed(2)} cups</div>
+              <div className="entries-list-mobile">
+                {todayEntries.slice().reverse().map(entry => 
+                  entry.feedingTimes.map((feeding, index) => (
+                    <div key={`${entry.id}-${index}`} className="entry-card-mobile">
+                      <div className="entry-header">
+                        <span className="entry-type">🍖</span>
+                        <span className="entry-time">{feeding.time}</span>
+                        <span className="entry-amount">{feeding.amount?.toFixed(2)} cups</span>
+                      </div>
+                      {entry.notes && (
+                        <div className="entry-notes">📝 {entry.notes}</div>
+                      )}
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             )}
           </div>

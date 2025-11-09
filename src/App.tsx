@@ -206,29 +206,6 @@ function App() {
     localStorage.setItem('husky-food-entries', JSON.stringify(updatedEntries));
   };
 
-  const handleUpdateFeedingTime = async (entryId: string, timeIndex: number, completed: boolean) => {
-    const updatedEntries = foodEntries.map(entry => {
-      if (entry.id === entryId) {
-        const updatedFeedingTimes = [...entry.feedingTimes];
-        updatedFeedingTimes[timeIndex] = { ...updatedFeedingTimes[timeIndex], completed };
-        return { ...entry, feedingTimes: updatedFeedingTimes };
-      }
-      return entry;
-    });
-    setFoodEntries(updatedEntries);
-    
-    // Save to both server and localStorage
-    const updatedEntry = updatedEntries.find(e => e.id === entryId);
-    if (updatedEntry) {
-      try {
-        await api.updateFoodEntry(updatedEntry);
-      } catch (error) {
-        console.error('Error saving to server:', error);
-      }
-    }
-    localStorage.setItem('husky-food-entries', JSON.stringify(updatedEntries));
-  };
-
   const handleAddPottyEntry = async (entry: Omit<PottyEntry, 'id'>) => {
     const newEntry: PottyEntry = {
       ...entry,
@@ -443,7 +420,6 @@ function App() {
           <FoodTracker
             foodEntries={foodEntries}
             onAddFoodEntry={handleAddFoodEntry}
-            onUpdateFeedingTime={handleUpdateFeedingTime}
           />
         )}
         {activeTab === 'potty' && (
