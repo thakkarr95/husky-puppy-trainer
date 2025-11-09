@@ -18,7 +18,7 @@ const FoodTracker = ({ foodEntries, onAddFoodEntry, onUpdateFeedingTime }: FoodT
   const [showAllGuidelines, setShowAllGuidelines] = useState(false);
   const [customTime, setCustomTime] = useState('');
   const [useCustomTime, setUseCustomTime] = useState(false);
-  const [feedAmount, setFeedAmount] = useState(1.0);
+  const [feedAmount, setFeedAmount] = useState(0.25);
 
   useEffect(() => {
     const age = calculatePuppyAge(puppyBirthDate);
@@ -174,7 +174,7 @@ const FoodTracker = ({ foodEntries, onAddFoodEntry, onUpdateFeedingTime }: FoodT
     // Reset form
     setCustomTime('');
     setUseCustomTime(false);
-    setFeedAmount(1.0);
+    setFeedAmount(0.25);
   };
 
   return (
