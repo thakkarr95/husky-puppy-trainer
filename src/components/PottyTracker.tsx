@@ -4,6 +4,7 @@ import type { PottyEntry } from '../types';
 interface PottyTrackerProps {
   pottyEntries: PottyEntry[];
   onAddPottyEntry: (entry: Omit<PottyEntry, 'id'>) => void;
+  onDeletePottyEntry?: (id: string) => void;
 }
 
 function PottyTracker({ pottyEntries, onAddPottyEntry }: PottyTrackerProps) {

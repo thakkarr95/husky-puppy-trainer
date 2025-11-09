@@ -1,4 +1,4 @@
-import type { TrainingTask, FoodEntry, PottyEntry, DailyTodoEntry } from './types';
+import type { TrainingTask, FoodEntry, PottyEntry, SleepEntry, DailyTodoEntry } from './types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
@@ -75,6 +75,42 @@ export async function addPottyEntry(entry: PottyEntry): Promise<void> {
   });
 }
 
+export async function deletePottyEntry(id: string): Promise<void> {
+  await apiCall(`/api/potty-entries/${id}`, {
+    method: 'DELETE',
+  });
+}
+
+export async function deleteFoodEntry(id: string): Promise<void> {
+  await apiCall(`/api/food-entries/${id}`, {
+    method: 'DELETE',
+  });
+}
+
+// ===== SLEEP ENTRIES API =====
+
+export async function getSleepEntries(): Promise<SleepEntry[]> {
+  const entries = await apiCall<any[]>('/api/sleep-entries');
+  // Convert date strings back to Date objects
+  return entries.map(entry => ({
+    ...entry,
+    date: new Date(entry.date),
+  }));
+}
+
+export async function addSleepEntry(entry: SleepEntry): Promise<void> {
+  await apiCall('/api/sleep-entries', {
+    method: 'POST',
+    body: JSON.stringify(entry),
+  });
+}
+
+export async function deleteSleepEntry(id: string): Promise<void> {
+  await apiCall(`/api/sleep-entries/${id}`, {
+    method: 'DELETE',
+  });
+}
+
 // ===== TODO ENTRIES API =====
 
 export async function getTodoEntries(): Promise<DailyTodoEntry[]> {
@@ -107,6 +143,7 @@ export interface SyncData {
   trainingTasks: Record<number, TrainingTask[]>;
   foodEntries: FoodEntry[];
   pottyEntries: PottyEntry[];
+  sleepEntries: SleepEntry[];
   puppyInfo: { birthDate?: string };
   todoEntries: DailyTodoEntry[];
 }
@@ -122,6 +159,10 @@ export async function syncAllData(): Promise<SyncData> {
       date: new Date(entry.date),
     })),
     pottyEntries: data.pottyEntries.map((entry: any) => ({
+      ...entry,
+      date: new Date(entry.date),
+    })),
+    sleepEntries: (data.sleepEntries || []).map((entry: any) => ({
       ...entry,
       date: new Date(entry.date),
     })),

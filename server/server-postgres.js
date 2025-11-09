@@ -41,6 +41,12 @@ async function initDatabase() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
+      CREATE TABLE IF NOT EXISTS sleep_entries (
+        id VARCHAR(255) PRIMARY KEY,
+        data JSONB NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
       CREATE TABLE IF NOT EXISTS puppy_info (
         id INTEGER PRIMARY KEY DEFAULT 1,
         data JSONB NOT NULL,
@@ -216,6 +222,44 @@ app.delete('/api/food-entries', async (req, res) => {
   }
 });
 
+// ===== SLEEP ENTRIES ENDPOINTS =====
+
+app.get('/api/sleep-entries', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT data FROM sleep_entries ORDER BY created_at ASC');
+    const entries = result.rows.map(row => row.data);
+    res.json(entries);
+  } catch (error) {
+    console.error('Error reading sleep entries:', error);
+    res.status(500).json({ error: 'Failed to read sleep entries' });
+  }
+});
+
+app.post('/api/sleep-entries', async (req, res) => {
+  try {
+    const entry = req.body;
+    await pool.query(
+      'INSERT INTO sleep_entries (id, data) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET data = $2',
+      [entry.id, entry]
+    );
+    res.json({ success: true, message: 'Sleep entry saved' });
+  } catch (error) {
+    console.error('Error saving sleep entry:', error);
+    res.status(500).json({ error: 'Failed to save sleep entry' });
+  }
+});
+
+app.delete('/api/sleep-entries/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await pool.query('DELETE FROM sleep_entries WHERE id = $1', [id]);
+    res.json({ success: true, message: 'Sleep entry deleted' });
+  } catch (error) {
+    console.error('Error deleting sleep entry:', error);
+    res.status(500).json({ error: 'Failed to delete sleep entry' });
+  }
+});
+
 // ===== PUPPY INFO ENDPOINTS =====
 
 app.get('/api/puppy-info', async (req, res) => {
@@ -273,10 +317,11 @@ app.post('/api/todo-entries', async (req, res) => {
 
 app.get('/api/sync', async (req, res) => {
   try {
-    const [trainingTasksResult, foodEntriesResult, pottyEntriesResult, puppyInfoResult, todoEntriesResult] = await Promise.all([
+    const [trainingTasksResult, foodEntriesResult, pottyEntriesResult, sleepEntriesResult, puppyInfoResult, todoEntriesResult] = await Promise.all([
       pool.query('SELECT data FROM training_tasks ORDER BY id DESC LIMIT 1'),
       pool.query('SELECT data FROM food_entries ORDER BY created_at ASC'),
       pool.query('SELECT data FROM potty_entries ORDER BY created_at ASC'),
+      pool.query('SELECT data FROM sleep_entries ORDER BY created_at ASC'),
       pool.query('SELECT data FROM puppy_info WHERE id = 1'),
       pool.query('SELECT data FROM todo_entries ORDER BY updated_at DESC')
     ]);
@@ -285,6 +330,7 @@ app.get('/api/sync', async (req, res) => {
       trainingTasks: trainingTasksResult.rows.length > 0 ? trainingTasksResult.rows[0].data : {},
       foodEntries: foodEntriesResult.rows.map(row => row.data),
       pottyEntries: pottyEntriesResult.rows.map(row => row.data),
+      sleepEntries: sleepEntriesResult.rows.map(row => row.data),
       puppyInfo: puppyInfoResult.rows.length > 0 ? puppyInfoResult.rows[0].data : {},
       todoEntries: todoEntriesResult.rows.map(row => row.data)
     });

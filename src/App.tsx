@@ -2,19 +2,21 @@ import { useState, useEffect } from 'react';
 import WeeklySchedule from './components/WeeklySchedule';
 import FoodTracker from './components/FoodTracker';
 import PottyTracker from './components/PottyTracker';
+import SleepTracker from './components/SleepTracker';
 import DailyTodoList from './components/DailyTodoList';
-import type { TrainingTask, FoodEntry, PottyEntry, DailyTodoEntry } from './types';
+import type { TrainingTask, FoodEntry, PottyEntry, SleepEntry, DailyTodoEntry } from './types';
 import { weeklyTraining } from './trainingData';
 import * as api from './api';
 import './App.css';
 
-type TabType = 'daily' | 'schedule' | 'food' | 'potty';
+type TabType = 'daily' | 'schedule' | 'food' | 'potty' | 'sleep';
 
 function App() {
   const [activeTab, setActiveTab] = useState<TabType>('daily');
   const [tasksByWeek, setTasksByWeek] = useState<Record<number, TrainingTask[]>>(weeklyTraining);
   const [foodEntries, setFoodEntries] = useState<FoodEntry[]>([]);
   const [pottyEntries, setPottyEntries] = useState<PottyEntry[]>([]);
+  const [sleepEntries, setSleepEntries] = useState<SleepEntry[]>([]);
   const [todoEntries, setTodoEntries] = useState<DailyTodoEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isOnline, setIsOnline] = useState(true);
@@ -78,6 +80,7 @@ function App() {
       console.log('Server data loaded:', {
         foodEntries: data.foodEntries.length,
         pottyEntries: data.pottyEntries.length,
+        sleepEntries: data.sleepEntries.length,
         todoEntries: data.todoEntries.length
       });
       
@@ -97,6 +100,7 @@ function App() {
       setTasksByWeek(Object.keys(merged).length > 0 ? merged : weeklyTraining);
       setFoodEntries(data.foodEntries);
       setPottyEntries(data.pottyEntries);
+      setSleepEntries(data.sleepEntries);
       
       // Only update todoEntries if we're not currently saving one (avoid race condition)
       if (!isSavingTodo) {
@@ -156,6 +160,17 @@ function App() {
           date: new Date(entry.date)
         }));
         setPottyEntries(entriesWithDates);
+      }
+
+      // Load sleep entries
+      const savedSleepEntries = localStorage.getItem('husky-sleep-entries');
+      if (savedSleepEntries) {
+        const parsed = JSON.parse(savedSleepEntries);
+        const entriesWithDates = parsed.map((entry: any) => ({
+          ...entry,
+          date: new Date(entry.date)
+        }));
+        setSleepEntries(entriesWithDates);
       }
 
       // Load todo entries
@@ -221,6 +236,58 @@ function App() {
       console.error('Error saving to server:', error);
     }
     localStorage.setItem('husky-potty-entries', JSON.stringify(updatedEntries));
+  };
+
+  // TODO: Implement delete functionality in PottyTracker UI
+  // const handleDeletePottyEntry = async (id: string) => {
+  //   const updatedEntries = pottyEntries.filter(e => e.id !== id);
+  //   setPottyEntries(updatedEntries);
+  //   
+  //   try {
+  //     await api.deletePottyEntry(id);
+  //   } catch (error) {
+  //     console.error('Error deleting from server:', error);
+  //   }
+  //   localStorage.setItem('husky-potty-entries', JSON.stringify(updatedEntries));
+  // };
+
+  // TODO: Implement delete functionality in FoodTracker UI
+  // const handleDeleteFoodEntry = async (id: string) => {
+  //   const updatedEntries = foodEntries.filter(e => e.id !== id);
+  //   setFoodEntries(updatedEntries);
+  //   
+  //   try {
+  //     await api.deleteFoodEntry(id);
+  //   } catch (error) {
+  //     console.error('Error deleting from server:', error);
+  //   }
+  //   localStorage.setItem('husky-food-entries', JSON.stringify(updatedEntries));
+  // };
+
+  const handleAddSleepEntry = async (entry: SleepEntry) => {
+    const updatedEntries = [...sleepEntries, entry];
+    setSleepEntries(updatedEntries);
+    
+    // Save to both server and localStorage
+    try {
+      await api.addSleepEntry(entry);
+    } catch (error) {
+      console.error('Error saving to server:', error);
+    }
+    localStorage.setItem('husky-sleep-entries', JSON.stringify(updatedEntries));
+  };
+
+  const handleDeleteSleepEntry = async (id: string) => {
+    const updatedEntries = sleepEntries.filter(e => e.id !== id);
+    setSleepEntries(updatedEntries);
+    
+    // Save to both server and localStorage
+    try {
+      await api.deleteSleepEntry(id);
+    } catch (error) {
+      console.error('Error deleting from server:', error);
+    }
+    localStorage.setItem('husky-sleep-entries', JSON.stringify(updatedEntries));
   };
 
   const handleUpdateTodo = async (entry: DailyTodoEntry) => {
@@ -396,6 +463,9 @@ function App() {
           <button onClick={() => setActiveTab('potty')} className={activeTab === 'potty' ? 'active' : ''}>
             🚽 Potty
           </button>
+          <button onClick={() => setActiveTab('sleep')} className={activeTab === 'sleep' ? 'active' : ''}>
+            💤 Sleep
+          </button>
           <button onClick={() => setActiveTab('schedule')} className={activeTab === 'schedule' ? 'active' : ''}>
             📋 Training
           </button>
@@ -426,6 +496,13 @@ function App() {
           <PottyTracker
             pottyEntries={pottyEntries}
             onAddPottyEntry={handleAddPottyEntry}
+          />
+        )}
+        {activeTab === 'sleep' && (
+          <SleepTracker
+            sleepEntries={sleepEntries}
+            onAddSleepEntry={handleAddSleepEntry}
+            onDeleteSleepEntry={handleDeleteSleepEntry}
           />
         )}
       </main>

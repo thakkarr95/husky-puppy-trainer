@@ -29,6 +29,18 @@ export interface PottyEntry {
   notes?: string;
 }
 
+export interface SleepEntry {
+  id: string;
+  date: Date;
+  startTime: string;
+  endTime: string;
+  duration: number; // in minutes
+  quality?: 'excellent' | 'good' | 'fair' | 'poor';
+  location?: 'crate' | 'bed' | 'couch' | 'other';
+  puppyAgeWeeks: number;
+  notes?: string;
+}
+
 export interface FeedingGuideline {
   ageWeeks: number;
   ageRange: string;
