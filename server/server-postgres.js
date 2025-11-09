@@ -158,6 +158,64 @@ app.post('/api/potty-entries', async (req, res) => {
   }
 });
 
+app.put('/api/potty-entries/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updatedEntry = req.body;
+    await pool.query(
+      'UPDATE potty_entries SET data = $1 WHERE id = $2',
+      [JSON.stringify(updatedEntry), id]
+    );
+    res.json({ success: true, data: updatedEntry });
+  } catch (error) {
+    console.error('Error updating potty entry:', error);
+    res.status(500).json({ error: 'Failed to update potty entry' });
+  }
+});
+
+app.delete('/api/potty-entries/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await pool.query('DELETE FROM potty_entries WHERE id = $1', [id]);
+    res.json({ success: true, message: 'Potty entry deleted' });
+  } catch (error) {
+    console.error('Error deleting potty entry:', error);
+    res.status(500).json({ error: 'Failed to delete potty entry' });
+  }
+});
+
+// Bulk delete all entries
+app.delete('/api/potty-entries', async (req, res) => {
+  try {
+    const result = await pool.query('DELETE FROM potty_entries');
+    res.json({ success: true, message: `Deleted ${result.rowCount} potty entries` });
+  } catch (error) {
+    console.error('Error deleting all potty entries:', error);
+    res.status(500).json({ error: 'Failed to delete all potty entries' });
+  }
+});
+
+app.delete('/api/food-entries/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await pool.query('DELETE FROM food_entries WHERE id = $1', [id]);
+    res.json({ success: true, message: 'Food entry deleted' });
+  } catch (error) {
+    console.error('Error deleting food entry:', error);
+    res.status(500).json({ error: 'Failed to delete food entry' });
+  }
+});
+
+app.delete('/api/food-entries', async (req, res) => {
+  try {
+    const result = await pool.query('DELETE FROM food_entries');
+    res.json({ success: true, message: `Deleted ${result.rowCount} food entries` });
+  } catch (error) {
+    console.error('Error deleting all food entries:', error);
+    res.status(500).json({ error: 'Failed to delete all food entries' });
+  }
+});
+
 // ===== PUPPY INFO ENDPOINTS =====
 
 app.get('/api/puppy-info', async (req, res) => {
