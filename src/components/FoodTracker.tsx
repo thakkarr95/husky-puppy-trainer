@@ -355,7 +355,7 @@ const FoodTracker = ({ foodEntries, onAddFoodEntry, onUpdateFeedingTime }: FoodT
                   min="0"
                   max="5"
                   value={feedAmount}
-                  onChange={(e) => setFeedAmount(parseFloat(e.target.value) || 0.5)}
+                  onChange={(e) => setFeedAmount(parseFloat(e.target.value) || 0.25)}
                   className="amount-input-large"
                 />
               </div>
