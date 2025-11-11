@@ -12,15 +12,33 @@ import './App.css';
 type TabType = 'daily' | 'schedule' | 'food' | 'potty' | 'sleep';
 
 // Helper functions to sort entries by time
+
+// Convert 12-hour time string (e.g., "03:30 PM") to minutes since midnight for comparison
+const timeToMinutes = (timeStr: string): number => {
+  if (!timeStr) return 0;
+  
+  const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
+  if (!match) return 0;
+  
+  let hours = parseInt(match[1]);
+  const minutes = parseInt(match[2]);
+  const period = match[3].toUpperCase();
+  
+  if (period === 'PM' && hours !== 12) hours += 12;
+  if (period === 'AM' && hours === 12) hours = 0;
+  
+  return hours * 60 + minutes;
+};
+
 const sortFoodEntries = (entries: FoodEntry[]): FoodEntry[] => {
   return [...entries].sort((a, b) => {
     const dateCompare = new Date(b.date).getTime() - new Date(a.date).getTime();
     if (dateCompare !== 0) return dateCompare;
     
-    // If same date, sort by first feeding time
-    const timeA = a.feedingTimes[0]?.time || '';
-    const timeB = b.feedingTimes[0]?.time || '';
-    return timeB.localeCompare(timeA);
+    // If same date, sort by first feeding time (latest first)
+    const timeA = timeToMinutes(a.feedingTimes[0]?.time || '');
+    const timeB = timeToMinutes(b.feedingTimes[0]?.time || '');
+    return timeB - timeA;
   });
 };
 
@@ -29,8 +47,10 @@ const sortPottyEntries = (entries: PottyEntry[]): PottyEntry[] => {
     const dateCompare = new Date(b.date).getTime() - new Date(a.date).getTime();
     if (dateCompare !== 0) return dateCompare;
     
-    // If same date, sort by time
-    return b.time.localeCompare(a.time);
+    // If same date, sort by time (latest first)
+    const timeA = timeToMinutes(a.time);
+    const timeB = timeToMinutes(b.time);
+    return timeB - timeA;
   });
 };
 
@@ -39,8 +59,10 @@ const sortSleepEntries = (entries: SleepEntry[]): SleepEntry[] => {
     const dateCompare = new Date(b.date).getTime() - new Date(a.date).getTime();
     if (dateCompare !== 0) return dateCompare;
     
-    // If same date, sort by end time
-    return b.endTime.localeCompare(a.endTime);
+    // If same date, sort by end time (latest first)
+    const timeA = timeToMinutes(a.endTime);
+    const timeB = timeToMinutes(b.endTime);
+    return timeB - timeA;
   });
 };
 
