@@ -7,15 +7,24 @@ interface DailyTodoListProps {
   onUpdateTodo: (entry: DailyTodoEntry) => void;
   onQuickLogFood?: (scheduleItemId: string, amount?: number, isTreat?: boolean) => void;
   onQuickLogPotty?: (scheduleItemId: string, type: 'pee' | 'poop' | 'both', location: 'outside' | 'inside', customTime?: string) => void;
+  onQuickLogSleep?: (duration?: number, quality?: 'poor' | 'fair' | 'good' | 'excellent') => void;
 }
 
-function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPotty }: DailyTodoListProps) {
+function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPotty, onQuickLogSleep }: DailyTodoListProps) {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [todayEntry, setTodayEntry] = useState<DailyTodoEntry | null>(null);
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [pottyLocations, setPottyLocations] = useState<Record<string, 'outside' | 'inside'>>({});
   const [feedingAmounts, setFeedingAmounts] = useState<Record<string, number>>({});
   const [showTreatLog, setShowTreatLog] = useState(false);
+  const [showFoodLog, setShowFoodLog] = useState(false);
+  const [showPottyLog, setShowPottyLog] = useState(false);
+  const [showSleepLog, setShowSleepLog] = useState(false);
+  const [quickFoodAmount, setQuickFoodAmount] = useState(0.25);
+  const [quickPottyType, setQuickPottyType] = useState<'pee' | 'poop' | 'both'>('pee');
+  const [quickPottyLocation, setQuickPottyLocation] = useState<'outside' | 'inside'>('outside');
+  const [quickSleepDuration, setQuickSleepDuration] = useState(1);
+  const [quickSleepQuality, setQuickSleepQuality] = useState<'poor' | 'fair' | 'good' | 'excellent'>('good');
   const [loggedPottyTypes, setLoggedPottyTypes] = useState<Record<string, Set<'pee' | 'poop'>>>({});
   const [showFollowUpForm, setShowFollowUpForm] = useState<Record<string, boolean>>({});
   const [followUpTimes, setFollowUpTimes] = useState<Record<string, string>>({});
@@ -160,6 +169,136 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
         <div className="view-only-notice">
           👀 <strong>View Only:</strong> You can only log activities for today. Use this to review past schedules or plan ahead.
         </div>
+      )}
+
+      {/* Quick Log Sections */}
+      {isToday() && (
+        <>
+          {/* Quick Food Log */}
+          {onQuickLogFood && (
+            <div className="quick-treat-section">
+              <button 
+                className="treat-toggle-btn"
+                onClick={() => setShowFoodLog(!showFoodLog)}
+              >
+                🍖 {showFoodLog ? 'Hide' : 'Log Feeding'}
+              </button>
+              {showFoodLog && (
+                <div className="treat-log-form">
+                  <label>Amount (cups):</label>
+                  <input 
+                    type="number"
+                    step="0.25"
+                    min="0"
+                    max="2"
+                    value={quickFoodAmount}
+                    onChange={(e) => setQuickFoodAmount(parseFloat(e.target.value) || 0.25)}
+                    className="amount-input"
+                  />
+                  <button 
+                    className="quick-log-btn treat-log"
+                    onClick={() => {
+                      onQuickLogFood('quick-food', quickFoodAmount, false);
+                      setShowFoodLog(false);
+                    }}
+                  >
+                    🍖 Log Feeding
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Quick Potty Log */}
+          {onQuickLogPotty && (
+            <div className="quick-treat-section">
+              <button 
+                className="treat-toggle-btn"
+                onClick={() => setShowPottyLog(!showPottyLog)}
+              >
+                🚽 {showPottyLog ? 'Hide' : 'Log Potty Break'}
+              </button>
+              {showPottyLog && (
+                <div className="treat-log-form">
+                  <label>Type:</label>
+                  <select 
+                    value={quickPottyType}
+                    onChange={(e) => setQuickPottyType(e.target.value as 'pee' | 'poop' | 'both')}
+                    className="amount-input"
+                  >
+                    <option value="pee">Pee</option>
+                    <option value="poop">Poop</option>
+                    <option value="both">Both</option>
+                  </select>
+                  <label>Location:</label>
+                  <select 
+                    value={quickPottyLocation}
+                    onChange={(e) => setQuickPottyLocation(e.target.value as 'outside' | 'inside')}
+                    className="amount-input"
+                  >
+                    <option value="outside">Outside</option>
+                    <option value="inside">Inside</option>
+                  </select>
+                  <button 
+                    className="quick-log-btn treat-log"
+                    onClick={() => {
+                      onQuickLogPotty('quick-potty', quickPottyType, quickPottyLocation);
+                      setShowPottyLog(false);
+                    }}
+                  >
+                    🚽 Log Potty
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Quick Sleep Log */}
+          {onQuickLogSleep && (
+            <div className="quick-treat-section">
+              <button 
+                className="treat-toggle-btn"
+                onClick={() => setShowSleepLog(!showSleepLog)}
+              >
+                💤 {showSleepLog ? 'Hide' : 'Log Sleep'}
+              </button>
+              {showSleepLog && (
+                <div className="treat-log-form">
+                  <label>Duration (hours):</label>
+                  <input 
+                    type="number"
+                    step="0.5"
+                    min="0.5"
+                    max="12"
+                    value={quickSleepDuration}
+                    onChange={(e) => setQuickSleepDuration(parseFloat(e.target.value) || 1)}
+                    className="amount-input"
+                  />
+                  <label>Quality:</label>
+                  <select 
+                    value={quickSleepQuality}
+                    onChange={(e) => setQuickSleepQuality(e.target.value as 'poor' | 'fair' | 'good' | 'excellent')}
+                    className="amount-input"
+                  >
+                    <option value="excellent">Excellent</option>
+                    <option value="good">Good</option>
+                    <option value="fair">Fair</option>
+                    <option value="poor">Poor</option>
+                  </select>
+                  <button 
+                    className="quick-log-btn treat-log"
+                    onClick={() => {
+                      onQuickLogSleep(quickSleepDuration, quickSleepQuality);
+                      setShowSleepLog(false);
+                    }}
+                  >
+                    💤 Log Sleep
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </>
       )}
 
       {/* Quick Treat Log */}

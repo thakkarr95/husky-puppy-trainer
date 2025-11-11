@@ -453,6 +453,49 @@ function App() {
     });
   };
 
+  const handleQuickLogSleep = (duration?: number, quality?: 'poor' | 'fair' | 'good' | 'excellent') => {
+    console.log('Quick log sleep clicked, duration:', duration, 'quality:', quality);
+    
+    // Create a sleep entry for current time
+    const now = new Date();
+    const currentAge = Math.floor((now.getTime() - new Date('2025-09-13').getTime()) / (1000 * 60 * 60 * 24 * 7));
+    const endTime = now.toLocaleTimeString('en-US', { 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      hour12: true 
+    });
+    
+    // Calculate start time based on duration
+    let startTime = endTime;
+    if (duration) {
+      const startDate = new Date(now.getTime() - duration * 60 * 60 * 1000);
+      startTime = startDate.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        hour12: true 
+      });
+    }
+    
+    const newEntry: SleepEntry = {
+      id: Date.now().toString(),
+      date: now,
+      startTime: startTime,
+      endTime: endTime,
+      duration: duration || 1,
+      quality: quality || 'good',
+      location: 'crate',
+      puppyAgeWeeks: currentAge,
+      notes: 'Logged from daily schedule'
+    };
+    
+    console.log('Creating sleep entry:', newEntry);
+    // Use the existing handler which already does optimistic update
+    handleAddSleepEntry(newEntry);
+    
+    // Show feedback
+    alert('Sleep logged! 💤\nSwitch to Sleep tab to see details.');
+  };
+
   if (isLoading) {
     return (
       <div className="App">
@@ -515,6 +558,7 @@ function App() {
             onUpdateTodo={handleUpdateTodo}
             onQuickLogFood={handleQuickLogFood}
             onQuickLogPotty={handleQuickLogPotty}
+            onQuickLogSleep={handleQuickLogSleep}
           />
         )}
         {activeTab === 'schedule' && (
