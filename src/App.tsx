@@ -31,20 +31,43 @@ const timeToMinutes = (timeStr: string): number => {
 };
 
 const sortFoodEntries = (entries: FoodEntry[]): FoodEntry[] => {
-  return [...entries].sort((a, b) => {
-    const dateCompare = new Date(b.date).getTime() - new Date(a.date).getTime();
+  const sorted = [...entries].sort((a, b) => {
+    // Get the date portion only (without time) for comparison
+    const dateA = new Date(a.date);
+    dateA.setHours(0, 0, 0, 0);
+    const dateB = new Date(b.date);
+    dateB.setHours(0, 0, 0, 0);
+    
+    const dateCompare = dateB.getTime() - dateA.getTime();
     if (dateCompare !== 0) return dateCompare;
     
     // If same date, sort by first feeding time (latest first)
     const timeA = timeToMinutes(a.feedingTimes[0]?.time || '');
     const timeB = timeToMinutes(b.feedingTimes[0]?.time || '');
+    
+    console.log(`Comparing: ${a.feedingTimes[0]?.time} (${timeA} min) vs ${b.feedingTimes[0]?.time} (${timeB} min) => ${timeB - timeA}`);
+    
     return timeB - timeA;
   });
+  
+  console.log('Sorted food entries:', sorted.map(e => ({
+    id: e.id,
+    date: e.date,
+    time: e.feedingTimes[0]?.time
+  })));
+  
+  return sorted;
 };
 
 const sortPottyEntries = (entries: PottyEntry[]): PottyEntry[] => {
   return [...entries].sort((a, b) => {
-    const dateCompare = new Date(b.date).getTime() - new Date(a.date).getTime();
+    // Get the date portion only (without time) for comparison
+    const dateA = new Date(a.date);
+    dateA.setHours(0, 0, 0, 0);
+    const dateB = new Date(b.date);
+    dateB.setHours(0, 0, 0, 0);
+    
+    const dateCompare = dateB.getTime() - dateA.getTime();
     if (dateCompare !== 0) return dateCompare;
     
     // If same date, sort by time (latest first)
@@ -56,7 +79,13 @@ const sortPottyEntries = (entries: PottyEntry[]): PottyEntry[] => {
 
 const sortSleepEntries = (entries: SleepEntry[]): SleepEntry[] => {
   return [...entries].sort((a, b) => {
-    const dateCompare = new Date(b.date).getTime() - new Date(a.date).getTime();
+    // Get the date portion only (without time) for comparison
+    const dateA = new Date(a.date);
+    dateA.setHours(0, 0, 0, 0);
+    const dateB = new Date(b.date);
+    dateB.setHours(0, 0, 0, 0);
+    
+    const dateCompare = dateB.getTime() - dateA.getTime();
     if (dateCompare !== 0) return dateCompare;
     
     // If same date, sort by end time (latest first)
@@ -153,7 +182,12 @@ function App() {
       });
       
       setTasksByWeek(Object.keys(merged).length > 0 ? merged : weeklyTraining);
-      setFoodEntries(sortFoodEntries(data.foodEntries));
+      
+      console.log('About to sort food entries, count:', data.foodEntries.length);
+      const sortedFood = sortFoodEntries(data.foodEntries);
+      console.log('Food entries after sorting:', sortedFood.length);
+      setFoodEntries(sortedFood);
+      
       setPottyEntries(sortPottyEntries(data.pottyEntries));
       setSleepEntries(sortSleepEntries(data.sleepEntries));
       
