@@ -23,7 +23,6 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
   const [quickFoodAmount, setQuickFoodAmount] = useState(0.25);
   const [quickPottyType, setQuickPottyType] = useState<'pee' | 'poop' | 'both'>('pee');
   const [quickPottyLocation, setQuickPottyLocation] = useState<'outside' | 'inside'>('outside');
-  const [quickSleepDuration, setQuickSleepDuration] = useState(1);
   const [quickSleepQuality, setQuickSleepQuality] = useState<'poor' | 'fair' | 'good' | 'excellent'>('good');
   const [napStartTime, setNapStartTime] = useState<Date | null>(null);
   const [napElapsedSeconds, setNapElapsedSeconds] = useState(0);
@@ -267,27 +266,17 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
             </div>
           )}
 
-          {/* Quick Sleep Log */}
+          {/* Quick Sleep Log - Nap Timer */}
           {onQuickLogSleep && (
             <div className="quick-treat-section">
               <button 
                 className="treat-toggle-btn"
                 onClick={() => setShowSleepLog(!showSleepLog)}
               >
-                💤 {showSleepLog ? 'Hide' : 'Log Sleep'}
+                💤 {showSleepLog ? 'Hide' : 'Start Nap'}
               </button>
               {showSleepLog && (
                 <div className="treat-log-form">
-                  <label>Duration (hours):</label>
-                  <input 
-                    type="number"
-                    step="0.5"
-                    min="0.5"
-                    max="12"
-                    value={quickSleepDuration}
-                    onChange={(e) => setQuickSleepDuration(parseFloat(e.target.value) || 1)}
-                    className="amount-input"
-                  />
                   <label>Quality:</label>
                   <select 
                     value={quickSleepQuality}
@@ -299,21 +288,9 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
                     <option value="fair">Fair</option>
                     <option value="poor">Poor</option>
                   </select>
-                  <button 
-                    className="quick-log-btn treat-log"
-                    onClick={() => {
-                      onQuickLogSleep(quickSleepDuration, quickSleepQuality);
-                      setShowSleepLog(false);
-                    }}
-                  >
-                    💤 Log Sleep
-                  </button>
                   
                   {/* Nap Timer */}
-                  <div style={{ marginTop: '15px', paddingTop: '15px', borderTop: '1px solid #ddd' }}>
-                    <label style={{ fontWeight: 'bold', marginBottom: '10px', display: 'block' }}>
-                      🕐 Nap Timer
-                    </label>
+                  <div style={{ marginTop: '15px' }}>
                     {!napStartTime ? (
                       <button 
                         className="quick-log-btn treat-log"
