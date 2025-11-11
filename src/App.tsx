@@ -11,6 +11,39 @@ import './App.css';
 
 type TabType = 'daily' | 'schedule' | 'food' | 'potty' | 'sleep';
 
+// Helper functions to sort entries by time
+const sortFoodEntries = (entries: FoodEntry[]): FoodEntry[] => {
+  return [...entries].sort((a, b) => {
+    const dateCompare = new Date(b.date).getTime() - new Date(a.date).getTime();
+    if (dateCompare !== 0) return dateCompare;
+    
+    // If same date, sort by first feeding time
+    const timeA = a.feedingTimes[0]?.time || '';
+    const timeB = b.feedingTimes[0]?.time || '';
+    return timeB.localeCompare(timeA);
+  });
+};
+
+const sortPottyEntries = (entries: PottyEntry[]): PottyEntry[] => {
+  return [...entries].sort((a, b) => {
+    const dateCompare = new Date(b.date).getTime() - new Date(a.date).getTime();
+    if (dateCompare !== 0) return dateCompare;
+    
+    // If same date, sort by time
+    return b.time.localeCompare(a.time);
+  });
+};
+
+const sortSleepEntries = (entries: SleepEntry[]): SleepEntry[] => {
+  return [...entries].sort((a, b) => {
+    const dateCompare = new Date(b.date).getTime() - new Date(a.date).getTime();
+    if (dateCompare !== 0) return dateCompare;
+    
+    // If same date, sort by end time
+    return b.endTime.localeCompare(a.endTime);
+  });
+};
+
 function App() {
   const [activeTab, setActiveTab] = useState<TabType>('daily');
   const [tasksByWeek, setTasksByWeek] = useState<Record<number, TrainingTask[]>>(weeklyTraining);
@@ -98,9 +131,9 @@ function App() {
       });
       
       setTasksByWeek(Object.keys(merged).length > 0 ? merged : weeklyTraining);
-      setFoodEntries(data.foodEntries);
-      setPottyEntries(data.pottyEntries);
-      setSleepEntries(data.sleepEntries);
+      setFoodEntries(sortFoodEntries(data.foodEntries));
+      setPottyEntries(sortPottyEntries(data.pottyEntries));
+      setSleepEntries(sortSleepEntries(data.sleepEntries));
       
       // Only update todoEntries if we're not currently saving one (avoid race condition)
       if (!isSavingTodo) {
@@ -148,7 +181,7 @@ function App() {
           ...entry,
           date: new Date(entry.date)
         }));
-        setFoodEntries(entriesWithDates);
+        setFoodEntries(sortFoodEntries(entriesWithDates));
       }
 
       // Load potty entries
@@ -159,7 +192,7 @@ function App() {
           ...entry,
           date: new Date(entry.date)
         }));
-        setPottyEntries(entriesWithDates);
+        setPottyEntries(sortPottyEntries(entriesWithDates));
       }
 
       // Load sleep entries
@@ -170,7 +203,7 @@ function App() {
           ...entry,
           date: new Date(entry.date)
         }));
-        setSleepEntries(entriesWithDates);
+        setSleepEntries(sortSleepEntries(entriesWithDates));
       }
 
       // Load todo entries
@@ -209,7 +242,7 @@ function App() {
   };
 
   const handleAddFoodEntry = async (entry: FoodEntry) => {
-    const updatedEntries = [...foodEntries, entry];
+    const updatedEntries = sortFoodEntries([...foodEntries, entry]);
     setFoodEntries(updatedEntries);
     
     // Save to both server and localStorage
@@ -226,7 +259,7 @@ function App() {
       ...entry,
       id: Date.now().toString()
     };
-    const updatedEntries = [...pottyEntries, newEntry];
+    const updatedEntries = sortPottyEntries([...pottyEntries, newEntry]);
     setPottyEntries(updatedEntries);
     
     // Save to both server and localStorage
@@ -239,7 +272,7 @@ function App() {
   };
 
   const handleUpdatePottyEntry = async (entry: PottyEntry) => {
-    const updatedEntries = pottyEntries.map(e => e.id === entry.id ? entry : e);
+    const updatedEntries = sortPottyEntries(pottyEntries.map(e => e.id === entry.id ? entry : e));
     setPottyEntries(updatedEntries);
     
     // Save to both server and localStorage
@@ -264,7 +297,7 @@ function App() {
   };
 
   const handleUpdateFoodEntry = async (entry: FoodEntry) => {
-    const updatedEntries = foodEntries.map(e => e.id === entry.id ? entry : e);
+    const updatedEntries = sortFoodEntries(foodEntries.map(e => e.id === entry.id ? entry : e));
     setFoodEntries(updatedEntries);
     
     // Save to both server and localStorage
@@ -289,7 +322,7 @@ function App() {
   };
 
   const handleAddSleepEntry = async (entry: SleepEntry) => {
-    const updatedEntries = [...sleepEntries, entry];
+    const updatedEntries = sortSleepEntries([...sleepEntries, entry]);
     setSleepEntries(updatedEntries);
     
     // Save to both server and localStorage
@@ -302,7 +335,7 @@ function App() {
   };
 
   const handleUpdateSleepEntry = async (entry: SleepEntry) => {
-    const updatedEntries = sleepEntries.map(e => e.id === entry.id ? entry : e);
+    const updatedEntries = sortSleepEntries(sleepEntries.map(e => e.id === entry.id ? entry : e));
     setSleepEntries(updatedEntries);
     
     // Save to both server and localStorage
