@@ -3815,14 +3815,18 @@
   align-items: center;
   gap: 0.75rem;
   margin-bottom: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .sleep-entry-card .entry-duration {
-  margin-left: auto;
   font-weight: 600;
   background: rgba(255, 255, 255, 0.2);
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
+}
+
+.sleep-entry-card .entry-actions {
+  margin-left: auto;
 }
 
 .sleep-entry-card .entry-details {
