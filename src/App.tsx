@@ -277,6 +277,19 @@ function App() {
     localStorage.setItem('husky-sleep-entries', JSON.stringify(updatedEntries));
   };
 
+  const handleUpdateSleepEntry = async (entry: SleepEntry) => {
+    const updatedEntries = sleepEntries.map(e => e.id === entry.id ? entry : e);
+    setSleepEntries(updatedEntries);
+    
+    // Save to both server and localStorage
+    try {
+      await api.updateSleepEntry(entry);
+    } catch (error) {
+      console.error('Error updating on server:', error);
+    }
+    localStorage.setItem('husky-sleep-entries', JSON.stringify(updatedEntries));
+  };
+
   const handleDeleteSleepEntry = async (id: string) => {
     const updatedEntries = sleepEntries.filter(e => e.id !== id);
     setSleepEntries(updatedEntries);
@@ -502,6 +515,7 @@ function App() {
           <SleepTracker
             sleepEntries={sleepEntries}
             onAddSleepEntry={handleAddSleepEntry}
+            onUpdateSleepEntry={handleUpdateSleepEntry}
             onDeleteSleepEntry={handleDeleteSleepEntry}
           />
         )}

@@ -11,10 +11,11 @@ import {
 interface SleepTrackerProps {
   sleepEntries: SleepEntry[];
   onAddSleepEntry: (entry: SleepEntry) => void;
+  onUpdateSleepEntry: (entry: SleepEntry) => void;
   onDeleteSleepEntry: (id: string) => void;
 }
 
-const SleepTracker = ({ sleepEntries, onAddSleepEntry, onDeleteSleepEntry }: SleepTrackerProps) => {
+const SleepTracker = ({ sleepEntries, onAddSleepEntry, onUpdateSleepEntry, onDeleteSleepEntry }: SleepTrackerProps) => {
   // Fixed puppy birth date - 09/13/2025 (pickup date is 11/8/2025 at 8 weeks old)
   const PUPPY_BIRTH_DATE = new Date('2025-09-13T00:00:00');
   const PUPPY_PICKUP_DATE = new Date('2025-11-08T00:00:00');
@@ -28,6 +29,9 @@ const SleepTracker = ({ sleepEntries, onAddSleepEntry, onDeleteSleepEntry }: Sle
   const [quality, setQuality] = useState<'excellent' | 'good' | 'fair' | 'poor'>('good');
   const [location, setLocation] = useState<'crate' | 'bed' | 'couch' | 'other'>('crate');
   const [notes, setNotes] = useState('');
+  
+  // Edit state
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   // Get today's entries
   const today = new Date();
@@ -86,21 +90,74 @@ const SleepTracker = ({ sleepEntries, onAddSleepEntry, onDeleteSleepEntry }: Sle
       return `${String(hour12).padStart(2, '0')}:${minutes} ${ampm}`;
     };
 
-    const newEntry: SleepEntry = {
-      id: Date.now().toString(),
-      date: new Date(),
-      startTime: format12Hour(startTime),
-      endTime: format12Hour(endTime),
-      duration,
-      quality,
-      location,
-      puppyAgeWeeks: currentPuppyAge,
-      notes: notes || undefined
-    };
-
-    onAddSleepEntry(newEntry);
+    if (editingId) {
+      // Update existing entry
+      const updatedEntry: SleepEntry = {
+        id: editingId,
+        date: sleepEntries.find(e => e.id === editingId)?.date || new Date(),
+        startTime: format12Hour(startTime),
+        endTime: format12Hour(endTime),
+        duration,
+        quality,
+        location,
+        puppyAgeWeeks: currentPuppyAge,
+        notes: notes || undefined
+      };
+      onUpdateSleepEntry(updatedEntry);
+      setEditingId(null);
+    } else {
+      // Create new entry
+      const newEntry: SleepEntry = {
+        id: Date.now().toString(),
+        date: new Date(),
+        startTime: format12Hour(startTime),
+        endTime: format12Hour(endTime),
+        duration,
+        quality,
+        location,
+        puppyAgeWeeks: currentPuppyAge,
+        notes: notes || undefined
+      };
+      onAddSleepEntry(newEntry);
+    }
     
     // Reset form
+    setStartTime('');
+    setEndTime('');
+    setQuality('good');
+    setLocation('crate');
+    setNotes('');
+  };
+
+  const handleEdit = (entry: SleepEntry) => {
+    // Convert 12-hour format back to 24-hour for the input
+    const convert12to24 = (time12: string) => {
+      const [time, period] = time12.split(' ');
+      let [hours, minutes] = time.split(':');
+      let hour = parseInt(hours);
+      
+      if (period === 'PM' && hour !== 12) {
+        hour += 12;
+      } else if (period === 'AM' && hour === 12) {
+        hour = 0;
+      }
+      
+      return `${String(hour).padStart(2, '0')}:${minutes}`;
+    };
+
+    setEditingId(entry.id);
+    setStartTime(convert12to24(entry.startTime));
+    setEndTime(convert12to24(entry.endTime));
+    setQuality(entry.quality || 'good');
+    setLocation(entry.location || 'crate');
+    setNotes(entry.notes || '');
+    
+    // Scroll to form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
     setStartTime('');
     setEndTime('');
     setQuality('good');
@@ -111,6 +168,9 @@ const SleepTracker = ({ sleepEntries, onAddSleepEntry, onDeleteSleepEntry }: Sle
   const handleDelete = (id: string) => {
     if (window.confirm('Are you sure you want to delete this sleep entry?')) {
       onDeleteSleepEntry(id);
+      if (editingId === id) {
+        handleCancelEdit();
+      }
     }
   };
 
@@ -225,7 +285,16 @@ const SleepTracker = ({ sleepEntries, onAddSleepEntry, onDeleteSleepEntry }: Sle
         </div>
 
         <div className="quick-log-section">
-          <h3>⚡ Quick Log Sleep</h3>
+          <h3>{editingId ? '✏️ Edit Sleep Session' : '⚡ Quick Log Sleep'}</h3>
+          
+          {editingId && (
+            <div className="edit-mode-banner">
+              <span>Editing sleep session</span>
+              <button onClick={handleCancelEdit} className="cancel-edit-btn">
+                Cancel
+              </button>
+            </div>
+          )}
           
           <div className="time-inputs-row">
             <div className="time-input-group">
@@ -300,7 +369,7 @@ const SleepTracker = ({ sleepEntries, onAddSleepEntry, onDeleteSleepEntry }: Sle
             onClick={handleQuickLogSleep}
             disabled={!startTime || !endTime}
           >
-            Log Sleep Session
+            {editingId ? 'Update Sleep Session' : 'Log Sleep Session'}
           </button>
         </div>
 
@@ -318,13 +387,22 @@ const SleepTracker = ({ sleepEntries, onAddSleepEntry, onDeleteSleepEntry }: Sle
                     <span className="entry-type">{getQualityEmoji(entry.quality)}</span>
                     <span className="entry-time">{entry.startTime} - {entry.endTime}</span>
                     <span className="entry-duration">{formatDuration(entry.duration)}</span>
-                    <button
-                      className="delete-entry-btn"
-                      onClick={() => handleDelete(entry.id)}
-                      title="Delete entry"
-                    >
-                      🗑️
-                    </button>
+                    <div className="entry-actions">
+                      <button
+                        className="edit-entry-btn"
+                        onClick={() => handleEdit(entry)}
+                        title="Edit entry"
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        className="delete-entry-btn"
+                        onClick={() => handleDelete(entry.id)}
+                        title="Delete entry"
+                      >
+                        🗑️
+                      </button>
+                    </div>
                   </div>
                   <div className="entry-details">
                     <span className="entry-location">

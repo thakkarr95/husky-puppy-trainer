@@ -105,6 +105,13 @@ export async function addSleepEntry(entry: SleepEntry): Promise<void> {
   });
 }
 
+export async function updateSleepEntry(entry: SleepEntry): Promise<void> {
+  await apiCall(`/api/sleep-entries/${entry.id}`, {
+    method: 'PUT',
+    body: JSON.stringify(entry),
+  });
+}
+
 export async function deleteSleepEntry(id: string): Promise<void> {
   await apiCall(`/api/sleep-entries/${id}`, {
     method: 'DELETE',

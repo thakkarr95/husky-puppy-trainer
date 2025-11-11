@@ -249,6 +249,20 @@ app.post('/api/sleep-entries', async (req, res) => {
   }
 });
 
+app.put('/api/sleep-entries/:id', async (req, res) => {
+  try {
+    const entry = req.body;
+    await pool.query(
+      'UPDATE sleep_entries SET data = $1 WHERE id = $2',
+      [entry, entry.id]
+    );
+    res.json({ success: true, message: 'Sleep entry updated' });
+  } catch (error) {
+    console.error('Error updating sleep entry:', error);
+    res.status(500).json({ error: 'Failed to update sleep entry' });
+  }
+});
+
 app.delete('/api/sleep-entries/:id', async (req, res) => {
   try {
     const { id } = req.params;
