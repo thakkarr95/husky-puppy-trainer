@@ -254,8 +254,14 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
                   <button 
                     className="quick-log-btn treat-log"
                     onClick={() => {
-                      onQuickLogPotty('quick-potty', quickPottyType, quickPottyLocation);
-                      setShowPottyLog(false);
+                      console.log('Quick potty button clicked, onQuickLogPotty is:', onQuickLogPotty);
+                      if (onQuickLogPotty) {
+                        console.log('Calling onQuickLogPotty with:', 'quick-potty', quickPottyType, quickPottyLocation);
+                        onQuickLogPotty('quick-potty', quickPottyType, quickPottyLocation);
+                        setShowPottyLog(false);
+                      } else {
+                        console.error('onQuickLogPotty is not defined!');
+                      }
                     }}
                   >
                     🚽 Log Potty

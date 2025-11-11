@@ -154,8 +154,14 @@ export const evaluateDailySleep = (totalMinutes: number, ageWeeks: number): {
 
 // Helper to format duration
 export const formatDuration = (minutes: number): string => {
+  // Handle very small durations (less than 1 minute) as seconds
+  if (minutes < 1) {
+    const seconds = Math.round(minutes * 60);
+    return `${seconds}s`;
+  }
+  
   const hours = Math.floor(minutes / 60);
-  const mins = minutes % 60;
+  const mins = Math.round(minutes % 60);
   
   if (hours === 0) {
     return `${mins}m`;

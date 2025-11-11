@@ -311,20 +311,25 @@ function App() {
   };
 
   const handleAddPottyEntry = async (entry: Omit<PottyEntry, 'id'>) => {
+    console.log('handleAddPottyEntry called with:', entry);
     const newEntry: PottyEntry = {
       ...entry,
       id: Date.now().toString()
     };
+    console.log('Created new entry with id:', newEntry.id);
     const updatedEntries = sortPottyEntries([...pottyEntries, newEntry]);
+    console.log('Updated entries count:', updatedEntries.length);
     setPottyEntries(updatedEntries);
     
     // Save to both server and localStorage
     try {
       await api.addPottyEntry(newEntry);
+      console.log('Successfully saved to server');
     } catch (error) {
       console.error('Error saving to server:', error);
     }
     localStorage.setItem('husky-potty-entries', JSON.stringify(updatedEntries));
+    console.log('Saved to localStorage');
   };
 
   const handleUpdatePottyEntry = async (entry: PottyEntry) => {
@@ -509,37 +514,40 @@ function App() {
     }
   };
 
-  const handleQuickLogPotty = (scheduleItemId: string, type: 'pee' | 'poop' | 'both', location: 'outside' | 'inside', customTime?: string) => {
-    console.log('Quick log potty clicked for item:', scheduleItemId);
+  const handleQuickLogPotty = async (scheduleItemId: string, type: 'pee' | 'poop' | 'both', location: 'outside' | 'inside', customTime?: string) => {
+    console.log('Quick log potty clicked for item:', scheduleItemId, 'type:', type, 'location:', location);
     
     // Find the schedule item to get context
-    import('./dailyScheduleData').then(({ puppyDailySchedule }) => {
-      const scheduleItem = puppyDailySchedule.find(item => item.id === scheduleItemId);
-      const context = scheduleItem ? scheduleItem.activity : undefined;
-      
-      // Create a potty entry for current time or custom time
-      const now = new Date();
-      const timeString = customTime || now.toLocaleTimeString('en-US', { 
-        hour: '2-digit', 
-        minute: '2-digit', 
-        hour12: true 
-      });
-      
-      const entryWithoutId = {
-        date: now,
-        time: timeString,
-        type: type,
-        location: location,
-        context: context,
-        notes: customTime ? 'Logged later from daily schedule' : 'Logged from daily schedule'
-      };
-      
-      // Use the existing handler which already does optimistic update
-      handleAddPottyEntry(entryWithoutId);
-      
-      // Mark this specific todo item as completed
-      markTodosCompleted(scheduleItemId);
+    const { puppyDailySchedule } = await import('./dailyScheduleData');
+    const scheduleItem = puppyDailySchedule.find(item => item.id === scheduleItemId);
+    const context = scheduleItem ? scheduleItem.activity : undefined;
+    
+    // Create a potty entry for current time or custom time
+    const now = new Date();
+    const timeString = customTime || now.toLocaleTimeString('en-US', { 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      hour12: true 
     });
+    
+    const entryWithoutId = {
+      date: now,
+      time: timeString,
+      type: type,
+      location: location,
+      context: context,
+      notes: customTime ? 'Logged later from daily schedule' : 'Logged from daily schedule'
+    };
+    
+    console.log('About to add potty entry:', entryWithoutId);
+    
+    // Use the existing handler which already does optimistic update
+    await handleAddPottyEntry(entryWithoutId);
+    
+    console.log('Potty entry added, current potty entries:', pottyEntries.length);
+    
+    // Mark this specific todo item as completed
+    markTodosCompleted(scheduleItemId);
   };
 
   const handleQuickLogSleep = (duration?: number, quality?: 'poor' | 'fair' | 'good' | 'excellent') => {
