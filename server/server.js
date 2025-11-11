@@ -144,6 +144,46 @@ app.post('/api/potty-entries', async (req, res) => {
   }
 });
 
+// Update potty entry
+app.put('/api/potty-entries/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updatedEntry = req.body;
+    const entries = await readDataFile('potty-entries.json') || [];
+    const index = entries.findIndex(e => e.id === id);
+    
+    if (index === -1) {
+      return res.status(404).json({ error: 'Potty entry not found' });
+    }
+    
+    entries[index] = updatedEntry;
+    await writeDataFile('potty-entries.json', entries);
+    res.json({ success: true, data: updatedEntry });
+  } catch (error) {
+    console.error('Error updating potty entry:', error);
+    res.status(500).json({ error: 'Failed to update potty entry' });
+  }
+});
+
+// Delete potty entry
+app.delete('/api/potty-entries/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const entries = await readDataFile('potty-entries.json') || [];
+    const filteredEntries = entries.filter(e => e.id !== id);
+    
+    if (filteredEntries.length === entries.length) {
+      return res.status(404).json({ error: 'Potty entry not found' });
+    }
+    
+    await writeDataFile('potty-entries.json', filteredEntries);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting potty entry:', error);
+    res.status(500).json({ error: 'Failed to delete potty entry' });
+  }
+});
+
 // ===== PUPPY INFO ENDPOINTS =====
 
 // Get puppy info (birth date, etc.)

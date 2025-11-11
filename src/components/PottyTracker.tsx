@@ -25,8 +25,20 @@ function PottyTracker({ pottyEntries, onAddPottyEntry, onUpdatePottyEntry, onDel
   const todayEntries = pottyEntries.filter(entry => {
     const entryDate = new Date(entry.date);
     entryDate.setHours(0, 0, 0, 0);
-    return entryDate.getTime() === today.getTime();
+    const matches = entryDate.getTime() === today.getTime();
+    if (!matches) {
+      console.log('Entry date mismatch:', { 
+        entryDate: entryDate.toString(), 
+        today: today.toString(), 
+        entryTime: entryDate.getTime(), 
+        todayTime: today.getTime(),
+        rawDate: entry.date
+      });
+    }
+    return matches;
   });
+  
+  console.log('Today\'s potty entries:', todayEntries.length, 'Total entries:', pottyEntries.length);
 
   // Get this week's stats
   const getWeekStart = () => {

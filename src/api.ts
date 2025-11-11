@@ -69,7 +69,7 @@ export async function getPottyEntries(): Promise<PottyEntry[]> {
 }
 
 export const addPottyEntry = async (entry: PottyEntry): Promise<PottyEntry> => {
-  const response = await fetch(`${API_BASE_URL}/potty-entries`, {
+  const response = await fetch(`${API_BASE_URL}/api/potty-entries`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(entry)
@@ -78,7 +78,7 @@ export const addPottyEntry = async (entry: PottyEntry): Promise<PottyEntry> => {
 };
 
 export const updatePottyEntry = async (entry: PottyEntry): Promise<PottyEntry> => {
-  const response = await fetch(`${API_BASE_URL}/potty-entries/${entry.id}`, {
+  const response = await fetch(`${API_BASE_URL}/api/potty-entries/${entry.id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(entry)
@@ -87,7 +87,7 @@ export const updatePottyEntry = async (entry: PottyEntry): Promise<PottyEntry> =
 };
 
 export const deletePottyEntry = async (id: string): Promise<void> => {
-  await fetch(`${API_BASE_URL}/potty-entries/${id}`, {
+  await fetch(`${API_BASE_URL}/api/potty-entries/${id}`, {
     method: 'DELETE'
   });
 };
