@@ -381,7 +381,7 @@ const SleepTracker = ({ sleepEntries, onAddSleepEntry, onUpdateSleepEntry, onDel
             </div>
           ) : (
             <div className="entries-list-mobile">
-              {todayEntries.slice().reverse().map(entry => (
+              {todayEntries.map(entry => (
                 <div key={entry.id} className="entry-card-mobile sleep-entry-card">
                   <div className="entry-header">
                     <span className="entry-type">{getQualityEmoji(entry.quality)}</span>

@@ -440,7 +440,7 @@ const FoodTracker = ({ foodEntries, onAddFoodEntry, onUpdateFoodEntry, onDeleteF
               </div>
             ) : (
               <div className="entries-list-mobile">
-                {todayEntries.slice().reverse().map(entry => 
+                {todayEntries.map(entry => 
                   entry.feedingTimes.map((feeding, index) => (
                     <div key={`${entry.id}-${index}`} className="entry-card-mobile">
                       <div className="entry-header">
@@ -480,7 +480,7 @@ const FoodTracker = ({ foodEntries, onAddFoodEntry, onUpdateFoodEntry, onDeleteF
               <p className="no-data">No entries yet. Start tracking above!</p>
             ) : (
               <div className="entries-list">
-                {foodEntries.slice().reverse().slice(0, 7).map(entry => {
+                {foodEntries.slice(0, 7).map(entry => {
                   const completedMeals = entry.feedingTimes.filter(ft => ft.completed).length;
                   const totalMeals = entry.feedingTimes.length;
                   const percentage = Math.round((completedMeals / totalMeals) * 100);

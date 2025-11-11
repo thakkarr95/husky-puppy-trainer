@@ -369,7 +369,7 @@ function PottyTracker({ pottyEntries, onAddPottyEntry, onUpdatePottyEntry, onDel
             </div>
           ) : (
             <div className="entries-list-mobile">
-              {todayEntries.slice().reverse().map(entry => (
+              {todayEntries.map(entry => (
                 <div key={entry.id} className="entry-card-mobile">
                   <div className="entry-header">
                     <span className="entry-type">{getTypeEmoji(entry.type)}</span>
