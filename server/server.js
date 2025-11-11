@@ -271,6 +271,56 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// ===== ACTIVE NAP ENDPOINTS =====
+
+// Get active nap
+app.get('/api/active-nap', async (req, res) => {
+  try {
+    const activeNap = await readDataFile('active-nap.json');
+    res.json(activeNap || null);
+  } catch (error) {
+    console.error('Error reading active nap:', error);
+    res.status(500).json({ error: 'Failed to read active nap' });
+  }
+});
+
+// Start nap
+app.post('/api/active-nap/start', async (req, res) => {
+  try {
+    const activeNap = {
+      id: Date.now().toString(),
+      startTime: new Date().toISOString()
+    };
+    await writeDataFile('active-nap.json', activeNap);
+    res.json({ success: true, data: activeNap });
+  } catch (error) {
+    console.error('Error starting nap:', error);
+    res.status(500).json({ error: 'Failed to start nap' });
+  }
+});
+
+// Stop nap (clears active nap)
+app.post('/api/active-nap/stop', async (req, res) => {
+  try {
+    await writeDataFile('active-nap.json', null);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error stopping nap:', error);
+    res.status(500).json({ error: 'Failed to stop nap' });
+  }
+});
+
+// Cancel nap (clears active nap without logging)
+app.post('/api/active-nap/cancel', async (req, res) => {
+  try {
+    await writeDataFile('active-nap.json', null);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error canceling nap:', error);
+    res.status(500).json({ error: 'Failed to cancel nap' });
+  }
+});
+
 // Start server
 async function startServer() {
   await initDataDir();

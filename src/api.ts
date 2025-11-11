@@ -194,3 +194,27 @@ export async function syncAllData(): Promise<SyncData> {
 export async function checkHealth(): Promise<{ status: string; timestamp: string }> {
   return apiCall('/api/health');
 }
+
+// ===== ACTIVE NAP API =====
+
+export async function getActiveNap(): Promise<any> {
+  return apiCall('/api/active-nap');
+}
+
+export async function startNap(): Promise<any> {
+  return apiCall('/api/active-nap/start', {
+    method: 'POST',
+  });
+}
+
+export async function stopNap(): Promise<void> {
+  await apiCall('/api/active-nap/stop', {
+    method: 'POST',
+  });
+}
+
+export async function cancelNap(): Promise<void> {
+  await apiCall('/api/active-nap/cancel', {
+    method: 'POST',
+  });
+}

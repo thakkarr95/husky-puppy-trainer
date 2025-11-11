@@ -41,6 +41,12 @@ export interface SleepEntry {
   notes?: string;
 }
 
+export interface ActiveNap {
+  id: string;
+  startTime: Date; // ISO timestamp
+  deviceId?: string; // Optional device identifier
+}
+
 export interface FeedingGuideline {
   ageWeeks: number;
   ageRange: string;

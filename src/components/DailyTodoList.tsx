@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { DailyTodoEntry } from '../types';
 import { puppyDailySchedule } from '../dailyScheduleData';
+import * as api from '../api';
 
 interface DailyTodoListProps {
   todoEntries: DailyTodoEntry[];
@@ -29,6 +30,28 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
   const [showFollowUpForm, setShowFollowUpForm] = useState<Record<string, boolean>>({});
   const [followUpTimes, setFollowUpTimes] = useState<Record<string, string>>({});
   const [followUpLocations, setFollowUpLocations] = useState<Record<string, 'outside' | 'inside'>>({});
+
+  // Load active nap from server on mount
+  useEffect(() => {
+    const loadActiveNap = async () => {
+      try {
+        const activeNap = await api.getActiveNap();
+        if (activeNap && activeNap.startTime) {
+          const startTime = new Date(activeNap.startTime);
+          setNapStartTime(startTime);
+          const elapsed = Math.floor((Date.now() - startTime.getTime()) / 1000);
+          setNapElapsedSeconds(elapsed);
+        }
+      } catch (error) {
+        console.error('Error loading active nap:', error);
+      }
+    };
+    loadActiveNap();
+
+    // Poll for active nap updates every 5 seconds
+    const pollInterval = setInterval(loadActiveNap, 5000);
+    return () => clearInterval(pollInterval);
+  }, []);
 
   // Nap timer effect
   useEffect(() => {
@@ -277,9 +300,17 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
               {!napStartTime ? (
                 <button 
                   className="treat-toggle-btn"
-                  onClick={() => {
-                    setNapStartTime(new Date());
-                    setNapElapsedSeconds(0);
+                  onClick={async () => {
+                    try {
+                      const result = await api.startNap();
+                      if (result && result.data) {
+                        setNapStartTime(new Date(result.data.startTime));
+                        setNapElapsedSeconds(0);
+                      }
+                    } catch (error) {
+                      console.error('Error starting nap:', error);
+                      alert('Failed to start nap. Please try again.');
+                    }
                   }}
                   style={{ backgroundColor: '#4CAF50', color: 'white' }}
                 >
@@ -311,10 +342,15 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
                   
                   <button 
                     className="quick-log-btn treat-log"
-                    onClick={() => {
+                    onClick={async () => {
                       if (napStartTime && onQuickLogSleep) {
                         const durationHours = napElapsedSeconds / 3600;
                         onQuickLogSleep(durationHours, quickSleepQuality);
+                        try {
+                          await api.stopNap();
+                        } catch (error) {
+                          console.error('Error stopping nap on server:', error);
+                        }
                         setNapStartTime(null);
                         setNapElapsedSeconds(0);
                       }
@@ -325,7 +361,12 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
                   </button>
                   <button 
                     className="quick-log-btn"
-                    onClick={() => {
+                    onClick={async () => {
+                      try {
+                        await api.cancelNap();
+                      } catch (error) {
+                        console.error('Error canceling nap on server:', error);
+                      }
                       setNapStartTime(null);
                       setNapElapsedSeconds(0);
                     }}
