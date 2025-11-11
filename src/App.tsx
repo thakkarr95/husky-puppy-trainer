@@ -238,31 +238,55 @@ function App() {
     localStorage.setItem('husky-potty-entries', JSON.stringify(updatedEntries));
   };
 
-  // TODO: Implement delete functionality in PottyTracker UI
-  // const handleDeletePottyEntry = async (id: string) => {
-  //   const updatedEntries = pottyEntries.filter(e => e.id !== id);
-  //   setPottyEntries(updatedEntries);
-  //   
-  //   try {
-  //     await api.deletePottyEntry(id);
-  //   } catch (error) {
-  //     console.error('Error deleting from server:', error);
-  //   }
-  //   localStorage.setItem('husky-potty-entries', JSON.stringify(updatedEntries));
-  // };
+  const handleUpdatePottyEntry = async (entry: PottyEntry) => {
+    const updatedEntries = pottyEntries.map(e => e.id === entry.id ? entry : e);
+    setPottyEntries(updatedEntries);
+    
+    // Save to both server and localStorage
+    try {
+      await api.updatePottyEntry(entry);
+    } catch (error) {
+      console.error('Error updating on server:', error);
+    }
+    localStorage.setItem('husky-potty-entries', JSON.stringify(updatedEntries));
+  };
 
-  // TODO: Implement delete functionality in FoodTracker UI
-  // const handleDeleteFoodEntry = async (id: string) => {
-  //   const updatedEntries = foodEntries.filter(e => e.id !== id);
-  //   setFoodEntries(updatedEntries);
-  //   
-  //   try {
-  //     await api.deleteFoodEntry(id);
-  //   } catch (error) {
-  //     console.error('Error deleting from server:', error);
-  //   }
-  //   localStorage.setItem('husky-food-entries', JSON.stringify(updatedEntries));
-  // };
+  const handleDeletePottyEntry = async (id: string) => {
+    const updatedEntries = pottyEntries.filter(e => e.id !== id);
+    setPottyEntries(updatedEntries);
+    
+    try {
+      await api.deletePottyEntry(id);
+    } catch (error) {
+      console.error('Error deleting from server:', error);
+    }
+    localStorage.setItem('husky-potty-entries', JSON.stringify(updatedEntries));
+  };
+
+  const handleUpdateFoodEntry = async (entry: FoodEntry) => {
+    const updatedEntries = foodEntries.map(e => e.id === entry.id ? entry : e);
+    setFoodEntries(updatedEntries);
+    
+    // Save to both server and localStorage
+    try {
+      await api.updateFoodEntry(entry);
+    } catch (error) {
+      console.error('Error updating on server:', error);
+    }
+    localStorage.setItem('husky-food-entries', JSON.stringify(updatedEntries));
+  };
+
+  const handleDeleteFoodEntry = async (id: string) => {
+    const updatedEntries = foodEntries.filter(e => e.id !== id);
+    setFoodEntries(updatedEntries);
+    
+    try {
+      await api.deleteFoodEntry(id);
+    } catch (error) {
+      console.error('Error deleting from server:', error);
+    }
+    localStorage.setItem('husky-food-entries', JSON.stringify(updatedEntries));
+  };
 
   const handleAddSleepEntry = async (entry: SleepEntry) => {
     const updatedEntries = [...sleepEntries, entry];
@@ -503,12 +527,16 @@ function App() {
           <FoodTracker
             foodEntries={foodEntries}
             onAddFoodEntry={handleAddFoodEntry}
+            onUpdateFoodEntry={handleUpdateFoodEntry}
+            onDeleteFoodEntry={handleDeleteFoodEntry}
           />
         )}
         {activeTab === 'potty' && (
           <PottyTracker
             pottyEntries={pottyEntries}
             onAddPottyEntry={handleAddPottyEntry}
+            onUpdatePottyEntry={handleUpdatePottyEntry}
+            onDeletePottyEntry={handleDeletePottyEntry}
           />
         )}
         {activeTab === 'sleep' && (

@@ -5,9 +5,11 @@ import { feedingGuidelines, getGuidelineForAge, calculatePuppyAge } from '../fee
 interface FoodTrackerProps {
   foodEntries: FoodEntry[];
   onAddFoodEntry: (entry: FoodEntry) => void;
+  onUpdateFoodEntry: (entry: FoodEntry) => void;
+  onDeleteFoodEntry: (id: string) => void;
 }
 
-const FoodTracker = ({ foodEntries, onAddFoodEntry }: FoodTrackerProps) => {
+const FoodTracker = ({ foodEntries, onAddFoodEntry, onUpdateFoodEntry, onDeleteFoodEntry }: FoodTrackerProps) => {
   // Fixed puppy birth date - 09/13/2025 (pickup date is 11/8/2025 at 8 weeks old)
   const PUPPY_BIRTH_DATE = new Date('2025-09-13T00:00:00');
   const PUPPY_PICKUP_DATE = new Date('2025-11-08T00:00:00');
@@ -17,6 +19,7 @@ const FoodTracker = ({ foodEntries, onAddFoodEntry }: FoodTrackerProps) => {
   const [customTime, setCustomTime] = useState('');
   const [useCustomTime, setUseCustomTime] = useState(false);
   const [feedAmount, setFeedAmount] = useState(0.25);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   // Get today's entries
   const today = new Date();
@@ -142,17 +145,76 @@ const FoodTracker = ({ foodEntries, onAddFoodEntry }: FoodTrackerProps) => {
       notes: useCustomTime ? 'Logged at specific time' : 'Quick logged'
     };
 
-    onAddFoodEntry(newEntry);
+    if (editingId) {
+      // Update existing entry
+      const existingEntry = foodEntries.find(e => e.id === editingId);
+      if (existingEntry) {
+        onUpdateFoodEntry({
+          ...newEntry,
+          id: editingId,
+          date: existingEntry.date
+        });
+      }
+    } else {
+      // Add new entry
+      onAddFoodEntry(newEntry);
+    }
     
     // Reset form
     setCustomTime('');
     setUseCustomTime(false);
     setFeedAmount(0.25);
+    setEditingId(null);
+  };
+
+  const handleEdit = (entry: FoodEntry) => {
+    // Convert 12-hour time to 24-hour format for input
+    const feedingTime = entry.feedingTimes[0];
+    if (feedingTime) {
+      const [time, period] = feedingTime.time.split(' ');
+      const [hours, minutes] = time.split(':');
+      let hour24 = parseInt(hours);
+      if (period === 'PM' && hour24 !== 12) hour24 += 12;
+      if (period === 'AM' && hour24 === 12) hour24 = 0;
+      const time24 = `${hour24.toString().padStart(2, '0')}:${minutes}`;
+      
+      setCustomTime(time24);
+      setUseCustomTime(true);
+      setFeedAmount(feedingTime.amount || 0.25);
+      setEditingId(entry.id);
+      
+      // Scroll to form
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setCustomTime('');
+    setUseCustomTime(false);
+    setFeedAmount(0.25);
+    setEditingId(null);
+  };
+
+  const handleDelete = (id: string) => {
+    if (window.confirm('Are you sure you want to delete this food entry?')) {
+      onDeleteFoodEntry(id);
+      if (editingId === id) {
+        handleCancelEdit();
+      }
+    }
   };
 
   return (
     <div className="food-tracker-container">
       <div className="tracker-content">
+        {editingId && (
+          <div className="edit-mode-banner">
+            <span>✏️ Editing food entry</span>
+            <button className="cancel-edit-btn" onClick={handleCancelEdit}>
+              Cancel
+            </button>
+          </div>
+        )}
         <div className="puppy-info-card">
           <h3>🐺 Puppy Information</h3>
           <div className="info-row">
@@ -365,7 +427,7 @@ const FoodTracker = ({ foodEntries, onAddFoodEntry }: FoodTrackerProps) => {
                 disabled={useCustomTime && !customTime}
               >
                 <span className="log-icon">📝</span>
-                <span>Log Feeding</span>
+                <span>{editingId ? 'Update' : 'Log'} Feeding</span>
               </button>
             </div>
           </div>
@@ -385,6 +447,22 @@ const FoodTracker = ({ foodEntries, onAddFoodEntry }: FoodTrackerProps) => {
                         <span className="entry-type">🍖</span>
                         <span className="entry-time">{feeding.time}</span>
                         <span className="entry-amount">{feeding.amount?.toFixed(2)} cups</span>
+                        <div className="entry-actions">
+                          <button 
+                            className="edit-entry-btn" 
+                            onClick={() => handleEdit(entry)}
+                            title="Edit entry"
+                          >
+                            ✏️
+                          </button>
+                          <button 
+                            className="delete-entry-btn" 
+                            onClick={() => handleDelete(entry.id)}
+                            title="Delete entry"
+                          >
+                            🗑️
+                          </button>
+                        </div>
                       </div>
                       {entry.notes && (
                         <div className="entry-notes">📝 {entry.notes}</div>

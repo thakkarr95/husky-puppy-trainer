@@ -4,15 +4,20 @@ import type { PottyEntry } from '../types';
 interface PottyTrackerProps {
   pottyEntries: PottyEntry[];
   onAddPottyEntry: (entry: Omit<PottyEntry, 'id'>) => void;
-  onDeletePottyEntry?: (id: string) => void;
+  onUpdatePottyEntry: (entry: PottyEntry) => void;
+  onDeletePottyEntry: (id: string) => void;
 }
 
-function PottyTracker({ pottyEntries, onAddPottyEntry }: PottyTrackerProps) {
+function PottyTracker({ pottyEntries, onAddPottyEntry, onUpdatePottyEntry, onDeletePottyEntry }: PottyTrackerProps) {
   const [selectedType, setSelectedType] = useState<'pee' | 'poop' | 'both'>('pee');
   const [selectedLocation, setSelectedLocation] = useState<'outside' | 'inside'>('outside');
   const [notes, setNotes] = useState('');
   const [customTime, setCustomTime] = useState('');
   const [useCustomTime, setUseCustomTime] = useState(false);
+  const [context, setContext] = useState('');
+  
+  // Edit state
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   // Get today's entries
   const today = new Date();
@@ -65,18 +70,82 @@ function PottyTracker({ pottyEntries, onAddPottyEntry }: PottyTrackerProps) {
       });
     }
 
-    onAddPottyEntry({
-      date: now,
-      time: timeString,
-      type: selectedType,
-      location: selectedLocation,
-      notes: notes.trim() || undefined
-    });
+    if (editingId) {
+      // Update existing entry
+      const existingEntry = pottyEntries.find(e => e.id === editingId);
+      if (existingEntry) {
+        onUpdatePottyEntry({
+          ...existingEntry,
+          time: timeString,
+          type: selectedType,
+          location: selectedLocation,
+          context: context.trim() || undefined,
+          notes: notes.trim() || undefined
+        });
+      }
+      setEditingId(null);
+    } else {
+      // Add new entry
+      onAddPottyEntry({
+        date: now,
+        time: timeString,
+        type: selectedType,
+        location: selectedLocation,
+        context: context.trim() || undefined,
+        notes: notes.trim() || undefined
+      });
+    }
 
     // Reset form after logging
     setNotes('');
+    setContext('');
     setCustomTime('');
     setUseCustomTime(false);
+  };
+
+  const handleEdit = (entry: PottyEntry) => {
+    // Convert 12-hour format back to 24-hour for the input
+    const convert12to24 = (time12: string) => {
+      const [time, period] = time12.split(' ');
+      let [hours, minutes] = time.split(':');
+      let hour = parseInt(hours);
+      
+      if (period === 'PM' && hour !== 12) {
+        hour += 12;
+      } else if (period === 'AM' && hour === 12) {
+        hour = 0;
+      }
+      
+      return `${String(hour).padStart(2, '0')}:${minutes}`;
+    };
+
+    setEditingId(entry.id);
+    setSelectedType(entry.type);
+    setSelectedLocation(entry.location);
+    setContext(entry.context || '');
+    setNotes(entry.notes || '');
+    setCustomTime(convert12to24(entry.time));
+    setUseCustomTime(true);
+    
+    // Scroll to form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setNotes('');
+    setContext('');
+    setCustomTime('');
+    setUseCustomTime(false);
+  };
+
+  const handleDelete = (id: string) => {
+    if (window.confirm('Are you sure you want to delete this potty entry?')) {
+      onDeletePottyEntry(id);
+      if (editingId === id) {
+        handleCancelEdit();
+      }
+    }
   };
 
   const getTypeEmoji = (type: 'pee' | 'poop' | 'both') => {
@@ -169,7 +238,16 @@ function PottyTracker({ pottyEntries, onAddPottyEntry }: PottyTrackerProps) {
 
         {/* Quick Log - Mobile Optimized */}
         <div className="quick-log-section">
-          <h3>🚽 Quick Log</h3>
+          <h3>{editingId ? '✏️ Edit Potty Entry' : '🚽 Quick Log'}</h3>
+          
+          {editingId && (
+            <div className="edit-mode-banner">
+              <span>Editing potty entry</span>
+              <button onClick={handleCancelEdit} className="cancel-edit-btn">
+                Cancel
+              </button>
+            </div>
+          )}
           
           <div className="quick-log-form">
             {/* Type Selection - Large Touch Targets */}
@@ -221,13 +299,25 @@ function PottyTracker({ pottyEntries, onAddPottyEntry }: PottyTrackerProps) {
               </div>
             </div>
 
+            {/* Context Input */}
+            <div className="form-group">
+              <label>Context (Optional)</label>
+              <input
+                type="text"
+                className="notes-input-mobile"
+                placeholder="e.g., After breakfast, After play..."
+                value={context}
+                onChange={(e) => setContext(e.target.value)}
+              />
+            </div>
+
             {/* Optional Notes */}
             <div className="form-group">
               <label>Notes (Optional)</label>
               <input
                 type="text"
                 className="notes-input-mobile"
-                placeholder="e.g., After meal, Before walk..."
+                placeholder="Additional notes..."
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
               />
@@ -265,7 +355,7 @@ function PottyTracker({ pottyEntries, onAddPottyEntry }: PottyTrackerProps) {
               disabled={useCustomTime && !customTime}
             >
               <span className="log-icon">📝</span>
-              <span>Log Potty Break</span>
+              <span>{editingId ? 'Update Potty Entry' : 'Log Potty Break'}</span>
             </button>
           </div>
         </div>
@@ -290,6 +380,22 @@ function PottyTracker({ pottyEntries, onAddPottyEntry }: PottyTrackerProps) {
                     >
                       {getLocationLabel(entry.location)}
                     </span>
+                    <div className="entry-actions">
+                      <button
+                        className="edit-entry-btn"
+                        onClick={() => handleEdit(entry)}
+                        title="Edit entry"
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        className="delete-entry-btn"
+                        onClick={() => handleDelete(entry.id)}
+                        title="Delete entry"
+                      >
+                        🗑️
+                      </button>
+                    </div>
                   </div>
                   {entry.context && (
                     <div className="entry-context">📍 {entry.context}</div>

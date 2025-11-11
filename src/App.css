@@ -2905,6 +2905,10 @@
   flex-wrap: wrap;
 }
 
+.entry-header .entry-actions {
+  margin-left: auto;
+}
+
 .entry-type {
   font-size: 1.5rem;
 }

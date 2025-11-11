@@ -68,18 +68,29 @@ export async function getPottyEntries(): Promise<PottyEntry[]> {
   }));
 }
 
-export async function addPottyEntry(entry: PottyEntry): Promise<void> {
-  await apiCall('/api/potty-entries', {
+export const addPottyEntry = async (entry: PottyEntry): Promise<PottyEntry> => {
+  const response = await fetch(`${API_BASE_URL}/potty-entries`, {
     method: 'POST',
-    body: JSON.stringify(entry),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(entry)
   });
-}
+  return response.json();
+};
 
-export async function deletePottyEntry(id: string): Promise<void> {
-  await apiCall(`/api/potty-entries/${id}`, {
-    method: 'DELETE',
+export const updatePottyEntry = async (entry: PottyEntry): Promise<PottyEntry> => {
+  const response = await fetch(`${API_BASE_URL}/potty-entries/${entry.id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(entry)
   });
-}
+  return response.json();
+};
+
+export const deletePottyEntry = async (id: string): Promise<void> => {
+  await fetch(`${API_BASE_URL}/potty-entries/${id}`, {
+    method: 'DELETE'
+  });
+};
 
 export async function deleteFoodEntry(id: string): Promise<void> {
   await apiCall(`/api/food-entries/${id}`, {
