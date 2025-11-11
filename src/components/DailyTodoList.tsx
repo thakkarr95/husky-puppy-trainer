@@ -25,10 +25,24 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
   const [quickPottyLocation, setQuickPottyLocation] = useState<'outside' | 'inside'>('outside');
   const [quickSleepDuration, setQuickSleepDuration] = useState(1);
   const [quickSleepQuality, setQuickSleepQuality] = useState<'poor' | 'fair' | 'good' | 'excellent'>('good');
+  const [napStartTime, setNapStartTime] = useState<Date | null>(null);
+  const [napElapsedSeconds, setNapElapsedSeconds] = useState(0);
   const [loggedPottyTypes, setLoggedPottyTypes] = useState<Record<string, Set<'pee' | 'poop'>>>({});
   const [showFollowUpForm, setShowFollowUpForm] = useState<Record<string, boolean>>({});
   const [followUpTimes, setFollowUpTimes] = useState<Record<string, string>>({});
   const [followUpLocations, setFollowUpLocations] = useState<Record<string, 'outside' | 'inside'>>({});
+
+  // Nap timer effect
+  useEffect(() => {
+    if (!napStartTime) return;
+    
+    const interval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - napStartTime.getTime()) / 1000);
+      setNapElapsedSeconds(elapsed);
+    }, 1000);
+    
+    return () => clearInterval(interval);
+  }, [napStartTime]);
 
   useEffect(() => {
     // Find or create entry for selected date
@@ -294,6 +308,62 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
                   >
                     💤 Log Sleep
                   </button>
+                  
+                  {/* Nap Timer */}
+                  <div style={{ marginTop: '15px', paddingTop: '15px', borderTop: '1px solid #ddd' }}>
+                    <label style={{ fontWeight: 'bold', marginBottom: '10px', display: 'block' }}>
+                      🕐 Nap Timer
+                    </label>
+                    {!napStartTime ? (
+                      <button 
+                        className="quick-log-btn treat-log"
+                        onClick={() => {
+                          setNapStartTime(new Date());
+                          setNapElapsedSeconds(0);
+                        }}
+                        style={{ backgroundColor: '#4CAF50' }}
+                      >
+                        ▶️ Start Nap
+                      </button>
+                    ) : (
+                      <div>
+                        <div style={{ 
+                          fontSize: '24px', 
+                          fontWeight: 'bold', 
+                          textAlign: 'center', 
+                          margin: '10px 0',
+                          color: '#4CAF50'
+                        }}>
+                          {Math.floor(napElapsedSeconds / 3600)}h {Math.floor((napElapsedSeconds % 3600) / 60)}m {napElapsedSeconds % 60}s
+                        </div>
+                        <button 
+                          className="quick-log-btn treat-log"
+                          onClick={() => {
+                            if (napStartTime && onQuickLogSleep) {
+                              const durationHours = napElapsedSeconds / 3600;
+                              onQuickLogSleep(durationHours, quickSleepQuality);
+                              setNapStartTime(null);
+                              setNapElapsedSeconds(0);
+                              setShowSleepLog(false);
+                            }
+                          }}
+                          style={{ backgroundColor: '#f44336', marginRight: '10px' }}
+                        >
+                          ⏹️ Stop & Log
+                        </button>
+                        <button 
+                          className="quick-log-btn"
+                          onClick={() => {
+                            setNapStartTime(null);
+                            setNapElapsedSeconds(0);
+                          }}
+                          style={{ backgroundColor: '#666' }}
+                        >
+                          ❌ Cancel
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
