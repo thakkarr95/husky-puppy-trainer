@@ -19,7 +19,6 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
   const [showTreatLog, setShowTreatLog] = useState(false);
   const [showFoodLog, setShowFoodLog] = useState(false);
   const [showPottyLog, setShowPottyLog] = useState(false);
-  const [showSleepLog, setShowSleepLog] = useState(false);
   const [quickFoodAmount, setQuickFoodAmount] = useState(0.25);
   const [quickPottyType, setQuickPottyType] = useState<'pee' | 'poop' | 'both'>('pee');
   const [quickPottyLocation, setQuickPottyLocation] = useState<'outside' | 'inside'>('outside');
@@ -269,14 +268,29 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
           {/* Quick Sleep Log - Nap Timer */}
           {onQuickLogSleep && (
             <div className="quick-treat-section">
-              <button 
-                className="treat-toggle-btn"
-                onClick={() => setShowSleepLog(!showSleepLog)}
-              >
-                💤 {showSleepLog ? 'Hide' : 'Start Nap'}
-              </button>
-              {showSleepLog && (
+              {!napStartTime ? (
+                <button 
+                  className="treat-toggle-btn"
+                  onClick={() => {
+                    setNapStartTime(new Date());
+                    setNapElapsedSeconds(0);
+                  }}
+                  style={{ backgroundColor: '#4CAF50', color: 'white' }}
+                >
+                  💤 Start Nap
+                </button>
+              ) : (
                 <div className="treat-log-form">
+                  <div style={{ 
+                    fontSize: '24px', 
+                    fontWeight: 'bold', 
+                    textAlign: 'center', 
+                    margin: '10px 0',
+                    color: '#4CAF50'
+                  }}>
+                    ⏱️ Nap in Progress: {Math.floor(napElapsedSeconds / 3600)}h {Math.floor((napElapsedSeconds % 3600) / 60)}m {napElapsedSeconds % 60}s
+                  </div>
+                  
                   <label>Quality:</label>
                   <select 
                     value={quickSleepQuality}
@@ -289,58 +303,30 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
                     <option value="poor">Poor</option>
                   </select>
                   
-                  {/* Nap Timer */}
-                  <div style={{ marginTop: '15px' }}>
-                    {!napStartTime ? (
-                      <button 
-                        className="quick-log-btn treat-log"
-                        onClick={() => {
-                          setNapStartTime(new Date());
-                          setNapElapsedSeconds(0);
-                        }}
-                        style={{ backgroundColor: '#4CAF50' }}
-                      >
-                        ▶️ Start Nap
-                      </button>
-                    ) : (
-                      <div>
-                        <div style={{ 
-                          fontSize: '24px', 
-                          fontWeight: 'bold', 
-                          textAlign: 'center', 
-                          margin: '10px 0',
-                          color: '#4CAF50'
-                        }}>
-                          {Math.floor(napElapsedSeconds / 3600)}h {Math.floor((napElapsedSeconds % 3600) / 60)}m {napElapsedSeconds % 60}s
-                        </div>
-                        <button 
-                          className="quick-log-btn treat-log"
-                          onClick={() => {
-                            if (napStartTime && onQuickLogSleep) {
-                              const durationHours = napElapsedSeconds / 3600;
-                              onQuickLogSleep(durationHours, quickSleepQuality);
-                              setNapStartTime(null);
-                              setNapElapsedSeconds(0);
-                              setShowSleepLog(false);
-                            }
-                          }}
-                          style={{ backgroundColor: '#f44336', marginRight: '10px' }}
-                        >
-                          ⏹️ Stop & Log
-                        </button>
-                        <button 
-                          className="quick-log-btn"
-                          onClick={() => {
-                            setNapStartTime(null);
-                            setNapElapsedSeconds(0);
-                          }}
-                          style={{ backgroundColor: '#666' }}
-                        >
-                          ❌ Cancel
-                        </button>
-                      </div>
-                    )}
-                  </div>
+                  <button 
+                    className="quick-log-btn treat-log"
+                    onClick={() => {
+                      if (napStartTime && onQuickLogSleep) {
+                        const durationHours = napElapsedSeconds / 3600;
+                        onQuickLogSleep(durationHours, quickSleepQuality);
+                        setNapStartTime(null);
+                        setNapElapsedSeconds(0);
+                      }
+                    }}
+                    style={{ backgroundColor: '#f44336', marginRight: '10px' }}
+                  >
+                    ⏹️ Stop & Log
+                  </button>
+                  <button 
+                    className="quick-log-btn"
+                    onClick={() => {
+                      setNapStartTime(null);
+                      setNapElapsedSeconds(0);
+                    }}
+                    style={{ backgroundColor: '#666' }}
+                  >
+                    ❌ Cancel
+                  </button>
                 </div>
               )}
             </div>
