@@ -4,6 +4,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+// Server version: 1.1.0 - Added active nap tracking endpoints
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
