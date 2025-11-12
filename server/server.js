@@ -16,6 +16,11 @@ const DATA_DIR = path.join(__dirname, 'data');
 app.use(cors());
 app.use(express.json());
 
+// Test endpoint to verify deployment version
+app.get('/api/version', (req, res) => {
+  res.json({ version: '1.1.0', features: ['active-nap-tracking'], timestamp: new Date().toISOString() });
+});
+
 // Ensure data directory exists
 async function initDataDir() {
   try {
