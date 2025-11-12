@@ -551,7 +551,7 @@ function App() {
   };
 
   const handleQuickLogSleep = (duration?: number, quality?: 'poor' | 'fair' | 'good' | 'excellent') => {
-    console.log('Quick log sleep clicked, duration:', duration, 'quality:', quality);
+    console.log('Quick log sleep clicked, duration (hours):', duration, 'quality:', quality);
     
     // Create a sleep entry for current time
     const now = new Date();
@@ -562,7 +562,7 @@ function App() {
       hour12: true 
     });
     
-    // Calculate start time based on duration
+    // Calculate start time based on duration (passed in hours)
     let startTime = endTime;
     if (duration) {
       const startDate = new Date(now.getTime() - duration * 60 * 60 * 1000);
@@ -573,19 +573,22 @@ function App() {
       });
     }
     
+    // Convert duration from hours to minutes for storage
+    const durationInMinutes = duration ? Math.round(duration * 60) : 1;
+    
     const newEntry: SleepEntry = {
       id: Date.now().toString(),
       date: now,
       startTime: startTime,
       endTime: endTime,
-      duration: duration || 1,
+      duration: durationInMinutes,
       quality: quality || 'good',
       location: 'crate',
       puppyAgeWeeks: currentAge,
       notes: 'Logged from daily schedule'
     };
     
-    console.log('Creating sleep entry:', newEntry);
+    console.log('Creating sleep entry:', newEntry, 'duration in minutes:', durationInMinutes);
     // Use the existing handler which already does optimistic update
     handleAddSleepEntry(newEntry);
     
