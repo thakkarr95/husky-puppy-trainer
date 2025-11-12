@@ -4202,20 +4202,125 @@
 }
 
 @media (max-width: 768px) {
+  .sleep-tracker-container {
+    padding: 0.5rem;
+  }
+
   .time-inputs-row {
     grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .time-input-group label {
+    font-size: 0.85rem;
   }
 
   .quality-buttons,
   .location-buttons {
     grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .quality-btn,
+  .location-btn {
+    padding: 1rem 0.5rem;
+    font-size: 0.9rem;
+    min-height: 60px;
+  }
+
+  .daily-progress-card {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .progress-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .progress-label {
+    font-size: 1rem;
+  }
+
+  .progress-status {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+    width: 100%;
+    text-align: center;
   }
 
   .progress-stats {
     grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .stat-item {
+    padding: 1rem;
+  }
+
+  .stat-value {
+    font-size: 1.8rem;
+  }
+
+  .duration-preview {
+    font-size: 1rem;
+    padding: 1rem;
   }
 
   .guidelines-grid {
     grid-template-columns: 1fr;
+  }
+
+  .guideline-card {
+    padding: 1rem;
+  }
+
+  .puppy-info-card,
+  .current-guideline-card {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .info-row {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .guideline-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .guideline-notes {
+    font-size: 0.85rem;
+  }
+
+  .sleep-entry-card {
+    padding: 1rem;
+  }
+
+  .sleep-entry-card .entry-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .sleep-entry-card .entry-actions {
+    margin-left: 0;
+    width: 100%;
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .sleep-entry-card .entry-actions button {
+    flex: 1;
+    padding: 0.75rem;
+    font-size: 1rem;
+  }
+
+  .sleep-entry-card .entry-details {
+    flex-direction: column;
+    gap: 0.5rem;
   }
 }
