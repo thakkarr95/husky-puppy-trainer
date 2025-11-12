@@ -36,11 +36,23 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
     const loadActiveNap = async () => {
       try {
         const activeNap = await api.getActiveNap();
+        console.log('Active nap from server:', activeNap);
+        
         if (activeNap && activeNap.startTime) {
+          // There's an active nap on the server
           const startTime = new Date(activeNap.startTime);
-          setNapStartTime(startTime);
-          const elapsed = Math.floor((Date.now() - startTime.getTime()) / 1000);
-          setNapElapsedSeconds(elapsed);
+          // Only update if different from current state
+          if (!napStartTime || napStartTime.getTime() !== startTime.getTime()) {
+            console.log('Updating nap start time to:', startTime);
+            setNapStartTime(startTime);
+            const elapsed = Math.floor((Date.now() - startTime.getTime()) / 1000);
+            setNapElapsedSeconds(elapsed);
+          }
+        } else if (napStartTime) {
+          // No active nap on server but we have local state - clear it
+          console.log('No active nap on server, clearing local state');
+          setNapStartTime(null);
+          setNapElapsedSeconds(0);
         }
       } catch (error) {
         console.error('Error loading active nap:', error);
@@ -51,7 +63,7 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
     // Poll for active nap updates every 5 seconds
     const pollInterval = setInterval(loadActiveNap, 5000);
     return () => clearInterval(pollInterval);
-  }, []);
+  }, [napStartTime]); // Add napStartTime to dependencies
 
   // Nap timer effect
   useEffect(() => {
@@ -302,14 +314,18 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
                   className="treat-toggle-btn"
                   onClick={async () => {
                     try {
+                      console.log('Starting nap...');
                       const result = await api.startNap();
+                      console.log('Nap start result:', result);
                       if (result && result.data) {
-                        setNapStartTime(new Date(result.data.startTime));
+                        const startTime = new Date(result.data.startTime);
+                        setNapStartTime(startTime);
                         setNapElapsedSeconds(0);
+                        console.log('Nap started successfully at:', startTime);
                       }
                     } catch (error) {
                       console.error('Error starting nap:', error);
-                      alert('Failed to start nap. Please try again.');
+                      alert('Failed to start nap. There may already be an active nap. Please refresh the page.');
                     }
                   }}
                   style={{ backgroundColor: '#4CAF50', color: 'white' }}
