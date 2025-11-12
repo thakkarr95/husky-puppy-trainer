@@ -33,16 +33,22 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
 
   // Load active nap from server on mount
   useEffect(() => {
+    let isSubscribed = true; // Prevent state updates if component unmounts
+    
     const loadActiveNap = async () => {
       try {
         const activeNap = await api.getActiveNap();
         console.log('Active nap from server:', activeNap);
         
-        if (activeNap && activeNap.startTime) {
+        if (!isSubscribed) return; // Don't update if unmounted
+        
+        if (activeNap && (activeNap.startTime || activeNap.start_time)) {
           // There's an active nap on the server
-          const startTime = new Date(activeNap.startTime);
+          const startTimeValue = activeNap.startTime || activeNap.start_time;
+          const startTime = new Date(startTimeValue);
+          
           // Only update if different from current state
-          if (!napStartTime || napStartTime.getTime() !== startTime.getTime()) {
+          if (!napStartTime || Math.abs(napStartTime.getTime() - startTime.getTime()) > 1000) {
             console.log('Updating nap start time to:', startTime);
             setNapStartTime(startTime);
             const elapsed = Math.floor((Date.now() - startTime.getTime()) / 1000);
@@ -58,12 +64,17 @@ function DailyTodoList({ todoEntries, onUpdateTodo, onQuickLogFood, onQuickLogPo
         console.error('Error loading active nap:', error);
       }
     };
+    
     loadActiveNap();
 
     // Poll for active nap updates every 5 seconds
     const pollInterval = setInterval(loadActiveNap, 5000);
-    return () => clearInterval(pollInterval);
-  }, [napStartTime]); // Add napStartTime to dependencies
+    
+    return () => {
+      isSubscribed = false;
+      clearInterval(pollInterval);
+    };
+  }, []); // Empty dependency array - only run once on mount
 
   // Nap timer effect
   useEffect(() => {

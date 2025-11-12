@@ -375,7 +375,15 @@ app.get('/api/health', (req, res) => {
 app.get('/api/active-nap', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM active_nap LIMIT 1');
-    res.json(result.rows.length > 0 ? result.rows[0] : null);
+    if (result.rows.length > 0) {
+      const row = result.rows[0];
+      res.json({
+        id: row.id,
+        startTime: row.start_time
+      });
+    } else {
+      res.json(null);
+    }
   } catch (error) {
     console.error('Error reading active nap:', error);
     res.status(500).json({ error: 'Failed to read active nap' });
