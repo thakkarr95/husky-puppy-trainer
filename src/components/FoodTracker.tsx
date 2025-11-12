@@ -475,44 +475,69 @@ const FoodTracker = ({ foodEntries, onAddFoodEntry, onUpdateFoodEntry, onDeleteF
           </div>
 
           <div className="recent-entries">
-            <h3>📅 Recent Entries</h3>
-            {foodEntries.length === 0 ? (
-              <p className="no-data">No entries yet. Start tracking above!</p>
-            ) : (
-              <div className="entries-list">
-                {foodEntries.slice(0, 7).map(entry => {
-                  const completedMeals = entry.feedingTimes.filter(ft => ft.completed).length;
-                  const totalMeals = entry.feedingTimes.length;
-                  const percentage = Math.round((completedMeals / totalMeals) * 100);
+            <details className="recent-history-section">
+              <summary>📊 This Week's History ({foodEntries.filter(entry => {
+                const weekAgo = new Date();
+                weekAgo.setDate(weekAgo.getDate() - 7);
+                return new Date(entry.date) >= weekAgo;
+              }).length} days tracked)</summary>
+              <div className="history-by-day">
+                {Array.from({ length: 7 }, (_, i) => {
+                  const date = new Date();
+                  date.setDate(date.getDate() - i);
+                  date.setHours(0, 0, 0, 0);
                   
+                  const dayEntries = foodEntries.filter(entry => {
+                    const entryDate = new Date(entry.date);
+                    entryDate.setHours(0, 0, 0, 0);
+                    return entryDate.getTime() === date.getTime();
+                  });
+
+                  const dayName = i === 0 ? 'Today' : i === 1 ? 'Yesterday' : date.toLocaleDateString('en-US', { weekday: 'short' });
+                  const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+                  // Calculate total cups fed this day
+                  const totalCups = dayEntries.reduce((sum, entry) => {
+                    return sum + entry.feedingTimes
+                      .filter(ft => ft.completed && ft.amount)
+                      .reduce((mealSum, ft) => mealSum + (ft.amount || 0), 0);
+                  }, 0);
+
+                  const mealsCompleted = dayEntries.reduce((sum, entry) => 
+                    sum + entry.feedingTimes.filter(ft => ft.completed).length, 0
+                  );
+
                   return (
-                    <div key={entry.id} className="entry-card">
-                      <div className="entry-header">
-                        <span className="entry-date">
-                          {new Date(entry.date).toLocaleDateString('en-US', { 
-                            weekday: 'short', 
-                            month: 'short', 
-                            day: 'numeric' 
-                          })}
+                    <div key={i} className="day-summary">
+                      <div className="day-header">
+                        <span className="day-name">{dayName}</span>
+                        <span className="day-date">{dateStr}</span>
+                        <span className="day-count">
+                          {mealsCompleted} meals • {totalCups.toFixed(2)} cups
                         </span>
-                        <span className="entry-age">{entry.puppyAgeWeeks} weeks old</span>
                       </div>
-                      <div className="entry-progress">
-                        <div className="mini-progress-bar">
-                          <div 
-                            className="mini-progress-fill"
-                            style={{ width: `${percentage}%` }}
-                          />
+                      {dayEntries.length > 0 && (
+                        <div className="day-entries">
+                          {dayEntries.flatMap(entry => 
+                            entry.feedingTimes
+                              .filter(ft => ft.completed)
+                              .map((ft, idx) => (
+                                <span 
+                                  key={`${entry.id}-${idx}`} 
+                                  className="mini-entry"
+                                  style={{ borderColor: '#667eea' }}
+                                >
+                                  🍽️ {ft.time} ({ft.amount?.toFixed(2) || '0.00'} cups)
+                                </span>
+                              ))
+                          )}
                         </div>
-                        <span className="entry-stats">
-                          {completedMeals}/{totalMeals} meals
-                        </span>
-                      </div>
+                      )}
                     </div>
                   );
                 })}
               </div>
-            )}
+            </details>
           </div>
 
         {/* Feeding Guidelines Section */}
